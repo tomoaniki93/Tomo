@@ -136,7 +136,7 @@ TomoPorter.Data = {
 
         current = {
             {
-                seasonLabel = "The War Within — Saison 3",
+                seasonLabel = "The War Within — Saison 2",
                 entries = list(
                     e(525),   -- Operation: Floodgate
                     e(542),   -- Eco-Dome Al'dani

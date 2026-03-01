@@ -362,7 +362,8 @@ function TM:UpdateTimerBar(preview)
     elseif self.completionTime then
         elapsed = self.completionTime / 1000
     elseif C_ChallengeMode.IsChallengeModeActive() then
-        elapsed = select(2, GetWorldElapsedTime(1)) or 0
+        -- GetWorldElapsedTime deprecated in 12.x
+        elapsed = (C_ChallengeMode.GetActiveChallengeElapsedTime and C_ChallengeMode.GetActiveChallengeElapsedTime()) or select(2, GetWorldElapsedTime and GetWorldElapsedTime(1) or 0, 0) or 0
     end
     if timeLimit <= 0 then timeLimit = 1800 end
 
@@ -527,7 +528,8 @@ function TM:UpdateBossRows(preview)
     local elapsed = 0
 
     if not preview and C_ChallengeMode.IsChallengeModeActive() then
-        elapsed = select(2, GetWorldElapsedTime(1)) or 0
+        -- GetWorldElapsedTime deprecated in 12.x
+        elapsed = (C_ChallengeMode.GetActiveChallengeElapsedTime and C_ChallengeMode.GetActiveChallengeElapsedTime()) or select(2, GetWorldElapsedTime and GetWorldElapsedTime(1) or 0, 0) or 0
     end
 
     local criteria = {}

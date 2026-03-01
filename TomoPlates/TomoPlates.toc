@@ -1,8 +1,8 @@
 ## Interface: 120001, 120000
 ##
-## Title: |cff8b5cf6Tomo|rPlates
+## Title: |cff8b5cf6Tomo|r|cffFFFFFFPlates|r
 ## Notes: Standalone nameplate addon — health bars, castbars, auras, tank mode.
-## Category: |cff8b5cf6HUD|r
+## Category: |cffCC44FFTomo|r|cffFFFFFFSuite|r
 ##
 ## SavedVariables: TomoPlatesDB
 ## Author: TomoAniki

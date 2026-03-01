@@ -1,10 +1,10 @@
 ## Interface: 120001, 120000
 ##
-## Title: |cfff59e0bTomo|r|cffFFFFFFFrames|r
-## Notes: Standalone unit frame addon — player, target, focus, pet, ToT, boss frames.
+## Title: |cfff43f5eTomo|r|cffFFFFFFSkins|r
+## Notes: Standalone UI skin addon — Character, Action Bars, Minimap, Objective Tracker.
 ## Category: |cffCC44FFTomo|r|cffFFFFFFSuite|r
 ##
-## SavedVariables: TomoFramesDB
+## SavedVariables: TomoSkinsDB
 ## Author: TomoAniki
 ## Version: 1.0.0
 
@@ -22,15 +22,10 @@ Config\Widgets.lua
 Config\Config.lua
 
 ## =====================
-## Elements
+## Modules
 ## =====================
-Elements\Health.lua
-Elements\Power.lua
-Elements\Castbar.lua
-Elements\Auras.lua
-
-## =====================
-## Unit Frames
-## =====================
-Units\UnitFrame.lua
-Units\BossFrames.lua
+Modules\CharacterSkin.lua
+Modules\ActionBarSkin.lua
+Modules\Minimap.lua
+Modules\InfoPanel.lua
+Modules\ObjectiveTracker.lua

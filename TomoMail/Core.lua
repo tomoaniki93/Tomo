@@ -143,7 +143,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
             for _, mod in pairs(TM.modules) do
                 if mod.OnInitialize then mod:OnInitialize() end
             end
-            TM:Print("v" .. TM.version .. " chargé. Tapez |cFFFFCC00/tml|r pour les options.")
+            TM:Print("v" .. TM.version .. " chargé. Tapez |cFFFFCC00/tomomail|r pour les options.")
             frame:UnregisterEvent("ADDON_LOADED")
         end
 
@@ -211,7 +211,8 @@ end
 --  Commande slash
 -- ============================================================
 
-SLASH_TOMOMAIL1 = "/tml"
+SLASH_TOMOMAIL1 = "/tomomail"
+SLASH_TOMOMAIL2 = "/tmail"
 
 SlashCmdList["TOMOMAIL"] = function(msg)
     if TomoMailConfig and TomoMailConfig.Toggle then

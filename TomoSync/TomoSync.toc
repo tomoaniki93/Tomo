@@ -3,11 +3,10 @@
 ## Notes: Synchronise les objets de vos sacs et banque sur tous vos personnages — affichage dans les tooltips
 ## Notes-frFR: Synchronise les objets de vos sacs et banque sur tous vos personnages — affichage dans les tooltips
 ## Notes-enUS: Synchronizes items from bags and bank across all your characters — shown in tooltips
-## Category: |cff0cd29fInventairy|r
-## Category-frFR: |cff0cd29fInventaire|r
-## Author: TomoAniki
+## Author: Tomo
 ## Version: 1.0.0
 ## SavedVariables: TomoSyncDB
+## Category: |cffCC44FFTomo|r|cffFFFFFFSuite|r
 
 Locales\frFR.lua
 Locales\enUS.lua

@@ -6,8 +6,7 @@
 ## Author: Tomo
 ## Version: 1.0.0
 ## SavedVariables: TomoMailDB
-## Category: |cff0cd29fMail|r
-## X-Curse-Project-ID: 
+## Category: |cffCC44FFTomo|r|cffFFFFFFSuite|r
 
 Locales\frFR.lua
 Locales\enUS.lua

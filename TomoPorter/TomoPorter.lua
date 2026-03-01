@@ -1,9 +1,9 @@
 -- TomoPorter | TomoPorter.lua
 -- Addon standalone — téléporteurs donjon/raid disponibles
--- Auteur : Tomo | Version 1.0.2
+-- Auteur : Tomo | Version 1.2.0
 -- Thème : Cyan
 --
--- /tmp  → ouvre/ferme la fenêtre
+-- /porter  ou  /tp  → ouvre/ferme la fenêtre
 
 TomoPorter = TomoPorter or {}
 
@@ -73,10 +73,7 @@ local function GetSpellIcon(spellID)
         local ok, tex = pcall(C_Spell.GetSpellTexture, spellID)
         if ok and tex then return tex end
     end
-    if GetSpellTexture then
-        local ok, tex = pcall(GetSpellTexture, spellID)
-        if ok and tex then return tex end
-    end
+    -- GetSpellTexture (global) removed in 12.x — C_Spell.GetSpellTexture is the only API
     return nil
 end
 
@@ -195,7 +192,7 @@ local function CreateMainFrame()
     SetBG(closeBtn, 0.55, 0.05, 0.05, 0.8)
     local xTxt = closeBtn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     xTxt:SetAllPoints()
-    xTxt:SetText("X")
+    xTxt:SetText("✕")
     xTxt:SetTextColor(1, 0.6, 0.6, 1)
     closeBtn:SetScript("OnEnter", function() closeBtn.bgTex:SetVertexColor(0.85, 0.10, 0.10, 1) end)
     closeBtn:SetScript("OnLeave", function() closeBtn.bgTex:SetVertexColor(0.55, 0.05, 0.05, 0.8) end)
@@ -512,12 +509,14 @@ local function Toggle()
     end
 end
 
-SLASH_TOPORTER1 = "/tmp"
+SLASH_TOPORTER1 = "/porter"
+SLASH_TOPORTER2 = "/tpt"
 SlashCmdList["TOPORTER"] = function(msg)
     local cmd = (msg or ""):lower():match("^%s*(%S*)")
     if cmd == "help" or cmd == "?" then
-        print("|cff00ddffTomoPorter|r  v1.0.2")
-        print("  /tmp     — ouvre/ferme la fenêtre")
+        print("|cff00ddffTomoPorter|r  v1.2")
+        print("  /porter  — ouvre/ferme la fenêtre")
+        print("  /tpt     — alias")
     else
         Toggle()
     end
@@ -534,7 +533,7 @@ eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED") -- sortie de combat
 eventFrame:SetScript("OnEvent", function(self, event)
     if event == "PLAYER_LOGIN" then
         BuildUI()
-        print("|cff00ddffTomoPorter|r v1.0.2 chargé — |cff4db8cc/tmp|r pour ouvrir")
+        print("|cff00ddffTomoPorter|r v1.2 chargé — |cff4db8cc/porter|r pour ouvrir")
         self:UnregisterEvent("PLAYER_LOGIN")
 
     elseif event == "SPELLS_CHANGED" then
