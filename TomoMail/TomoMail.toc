@@ -1,0 +1,21 @@
+## Interface: 120001, 120000
+## Title: |cFFFFCC00Tomo|r|cFFFFFFFFMail|r
+## Notes: Gestionnaire de courrier avancé — Alts, Guilde, Envoi rapide
+## Notes-frFR: Gestionnaire de courrier avancé — Alts, Guilde, Envoi rapide
+## Notes-enUS: Advanced mail manager — Alts, Guild, Quick Send
+## Author: Tomo
+## Version: 1.0.0
+## SavedVariables: TomoMailDB
+## Category: |cff0cd29fMail|r
+## X-Curse-Project-ID: 
+
+Locales\frFR.lua
+Locales\enUS.lua
+
+Database.lua
+Core.lua
+
+Modules\Contacts.lua
+Modules\QuickSend.lua
+
+Config.lua

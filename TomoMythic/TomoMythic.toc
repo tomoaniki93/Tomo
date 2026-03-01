@@ -1,0 +1,22 @@
+## Interface: 120001, 120000
+## Title: |cFF55B400Tomo|r|cFF2266AAMythic|r
+## Notes: Mythic+ UI replacement — standalone, no dependencies. Optional TomoMod skin integration.
+## Notes-frFR: Remplacement de l'interface Mythic+ — autonome, sans dépendances. Intégration skin TomoMod optionnelle.
+## Category: |cff0cd29fHUD|r
+## Category-frFR: |cff0cd29fHUD|r
+## Author: TomoAniki
+## Version: 1.0.0
+## SavedVariables: TomoMythicDB
+## OptionalDeps: TomoMod
+## DefaultState: Enabled
+## X-Curse-Project-ID: 
+
+Locales\enUS.lua
+Locales\frFR.lua
+
+Database.lua
+Core.lua
+Blizzard.lua
+Display.lua
+Events.lua
+Config.lua

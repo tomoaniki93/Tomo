@@ -1,0 +1,21 @@
+## Interface: 120001, 120000
+## Title: |cFFCC44FFTomo|r|cFFFFFFFFSync|r
+## Notes: Synchronise les objets de vos sacs et banque sur tous vos personnages — affichage dans les tooltips
+## Notes-frFR: Synchronise les objets de vos sacs et banque sur tous vos personnages — affichage dans les tooltips
+## Notes-enUS: Synchronizes items from bags and bank across all your characters — shown in tooltips
+## Category: |cff0cd29fInventairy|r
+## Category-frFR: |cff0cd29fInventaire|r
+## Author: TomoAniki
+## Version: 1.0.0
+## SavedVariables: TomoSyncDB
+
+Locales\frFR.lua
+Locales\enUS.lua
+
+Database.lua
+Core.lua
+
+Modules\Scanner.lua
+Modules\Tooltip.lua
+
+Config.lua

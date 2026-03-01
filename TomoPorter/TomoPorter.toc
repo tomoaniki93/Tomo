@@ -1,0 +1,13 @@
+## Interface: 120001, 120000
+## Title: TomoPorter
+## Notes: Affiche tous les téléporteurs de donjon/raid disponibles selon la saison
+## Notes-frFR: Affiche tous les téléporteurs de donjon/raid disponibles selon la saison
+## Author: TomoAniki
+## Category: |cff0cd29fHUD|r
+## Version: 1.0.2
+## IconTexture: 132161
+## X-Curse-Project-ID: 1469274
+
+Locales.lua
+Data.lua
+TomoPorter.lua
