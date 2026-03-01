@@ -2,9 +2,7 @@
 
 > Standalone unit frame addon for World of Warcraft: Midnight
 
-![Version](https://img.shields.io/badge/version-1.0.0-f59e0b)
-![WoW](https://img.shields.io/badge/WoW-12.x%20%2F%2C%2012.x-f59e0b)
-![License](https://img.shields.io/badge/license-MIT-f59e0b)
+# ![TomoFrames](https://img.shields.io/badge/TomoFrames-v1.0.0-0cd29f?style=for-the-badge) ![WoW](https://img.shields.io/badge/WoW-Midnight-blue?style=for-the-badge) ![Interface](https://img.shields.io/badge/Interface-120001-orange?style=for-the-badge)
 
 ---
 
