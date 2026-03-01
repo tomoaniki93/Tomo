@@ -1,0 +1,36 @@
+## Interface: 120001, 120000
+##
+## Title: |cfff59e0bTomo|rFrames
+## Notes: Standalone unit frame addon — player, target, focus, pet, ToT, boss frames.
+## Category: |cfff59e0bHUD|r
+##
+## SavedVariables: TomoFramesDB
+## Author: TomoAniki
+## Version: 1.0.0
+
+## =====================
+## Core
+## =====================
+Core\Database.lua
+Core\Utils.lua
+Core\Init.lua
+
+## =====================
+## Config UI
+## =====================
+Config\Widgets.lua
+Config\Config.lua
+
+## =====================
+## Elements
+## =====================
+Elements\Health.lua
+Elements\Power.lua
+Elements\Castbar.lua
+Elements\Auras.lua
+
+## =====================
+## Unit Frames
+## =====================
+Units\UnitFrame.lua
+Units\BossFrames.lua

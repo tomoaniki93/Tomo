@@ -1,0 +1,29 @@
+## Interface: 120001, 120000
+##
+## Title: |cff06b6d4Tomo|rCooldown
+## Notes: Standalone addon — Cooldown Manager, Resource Bars, Skyriding bar.
+## Category: |cff06b6d4HUD|r
+##
+## SavedVariables: TomoCooldownDB
+## Author: TomoAniki
+## Version: 1.0.0
+
+## =====================
+## Core
+## =====================
+Core\Database.lua
+Core\Utils.lua
+Core\Init.lua
+
+## =====================
+## Config UI
+## =====================
+Config\Widgets.lua
+Config\Config.lua
+
+## =====================
+## Modules
+## =====================
+Modules\CooldownManager.lua
+Modules\ResourceBars.lua
+Modules\SkyRide.lua
