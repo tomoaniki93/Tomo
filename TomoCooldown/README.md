@@ -2,9 +2,7 @@
 
 > Standalone cooldown, resource bar, and Skyriding addon for World of Warcraft: Midnight
 
-![Version](https://img.shields.io/badge/version-1.0.0-06b6d4)
-![WoW](https://img.shields.io/badge/WoW-12.x%20%2F%2012.x-06b6d4)
-![License](https://img.shields.io/badge/license-MIT-06b6d4)
+# ![TomoCooldown](https://img.shields.io/badge/TomoCooldown-v1.0.0-0cd29f?style=for-the-badge) ![WoW](https://img.shields.io/badge/WoW-Midnight-blue?style=for-the-badge) ![Interface](https://img.shields.io/badge/Interface-120001-orange?style=for-the-badge)
 
 ---
 
