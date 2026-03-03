@@ -1,0 +1,38 @@
+## Interface: 120001, 120000
+## 
+## Title: |cffd1b559Tomo|r|cffffffffCastbar|r
+## Notes: Standalone castbar addon — Player, Target, Focus. Supports casts, channels, and empowered (Evoker).
+## Category: |cffCC44FFTomo|r|cffFFFFFFSuite|r
+## 
+## SavedVariables: TomoCastbarDB
+## Author: TomoAniki
+## Version: 1.0.0
+## IconTexture: Interface\Icons\Spell_Nature_Lightning
+
+## =====================
+## Locales (loaded first)
+## =====================
+Locales\enUS.lua
+Locales\frFR.lua
+
+## =====================
+## Core
+## =====================
+Core\Utils.lua
+Core\Database.lua
+
+## =====================
+## Config UI
+## =====================
+Config\Widgets.lua
+Config\ConfigUI.lua
+
+## =====================
+## Castbar Module
+## =====================
+Modules\Castbar.lua
+
+## =====================
+## Initialization
+## =====================
+Core\Init.lua
