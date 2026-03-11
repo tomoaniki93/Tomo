@@ -44,7 +44,9 @@ function TM:OnEvent(event, ...)
             self:InitDB()
             self:BuildFrame()
             self:InitBlizzardSuppress()
-            self:InitInterruptTracker()
+            if self.db.showInterrupt then
+                self:InitInterruptTracker()
+            end
             local p = self.db.position
             self.Frame:ClearAllPoints()
             self.Frame:SetPoint(p.anchor, UIParent, p.relTo, p.x, p.y)

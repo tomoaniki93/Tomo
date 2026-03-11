@@ -204,7 +204,9 @@ end
 ------------------------------------------------------------
 
 local function ShouldShowFrame()
-    if not TM.db or not TM.db.interrupt then return false end
+    if not TM.db then return false end
+    if not TM.db.showInterrupt then return false end
+    if not TM.db.interrupt then return false end
     local db = TM.db.interrupt
     local _, instanceType = IsInInstance()
     if instanceType == "party" then return db.showInDungeon   end
@@ -1143,6 +1145,19 @@ function TM:OnInterruptEnterWorld()
         MIT.mainFrame:Show()
     else
         MIT.mainFrame:Hide()
+    end
+end
+
+function TM:SetInterruptTrackerEnabled(enabled)
+    if enabled then
+        if not MIT.mainFrame then
+            self:InitInterruptTracker()
+        end
+        self:OnInterruptEnterWorld()
+    else
+        if MIT.mainFrame then
+            MIT.mainFrame:Hide()
+        end
     end
 end
 

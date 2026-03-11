@@ -8,7 +8,7 @@ local _, TM = ...
 function TM:BuildConfigPanel()
     if self.ConfigPanel then return end
     local L, C = self.L, self.C
-    local W, H = 300, 410
+    local W, H = 300, 434
 
     local P = CreateFrame("Frame", "TomoMythicConfig", UIParent, "BackdropTemplate")
     self.ConfigPanel = P
@@ -152,7 +152,8 @@ function TM:BuildConfigPanel()
     CB(L.CFG_SHOW_TIMER,  y, "showTimer",  function(v) if TM.Frame then TM.Frame.TimerBar:SetShown(v); TM:LayoutFrame() end end) ; y = y - 24
     CB(L.CFG_SHOW_FORCES, y, "showForces", function(v) if TM.Frame then TM.Frame.ForcesBar:SetShown(v); TM:LayoutFrame() end end) ; y = y - 24
     CB(L.CFG_SHOW_BOSSES, y, "showBosses", function() TM:UpdateBossRows(); TM:LayoutFrame() end) ; y = y - 24
-    CB(L.CFG_HIDE_BLIZZARD, y, "hideBlizzard", function(v) if v and TM._inChallenge then TM:SuppressBlizzardUI() end end) ; y = y - 34
+    CB(L.CFG_HIDE_BLIZZARD, y, "hideBlizzard", function(v) if v and TM._inChallenge then TM:SuppressBlizzardUI() end end) ; y = y - 24
+    CB(L.CFG_SHOW_INTERRUPT, y, "showInterrupt", function(v) TM:SetInterruptTrackerEnabled(v) end) ; y = y - 34
 
     SectionHdr(L.CFG_SECTION_FRAME, y) ; y = y - 20
     CB(L.CFG_LOCK, y, "locked", function(v) TM:SetMovable(not v) end) ; y = y - 30

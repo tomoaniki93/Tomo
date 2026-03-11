@@ -11,6 +11,7 @@ TM.Defaults = {
     showTimer    = true,
     showForces   = true,
     showBosses   = true,
+    showInterrupt = true,
     interrupt    = {
         frameWidth      = 220,
         barHeight       = 28,

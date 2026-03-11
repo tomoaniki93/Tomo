@@ -34,6 +34,7 @@ TM.L = {
     CFG_SHOW_FORCES     = "Show Enemy Forces",
     CFG_SHOW_BOSSES     = "Show Boss Timers",
     CFG_HIDE_BLIZZARD   = "Hide Blizzard Tracker",
+    CFG_SHOW_INTERRUPT   = "Interrupt Tracker",
     CFG_LOCK            = "Lock Frame",
     CFG_SCALE           = "Scale",
     CFG_ALPHA           = "Background Opacity",

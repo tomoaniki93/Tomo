@@ -297,7 +297,7 @@ function TM:UpdateHeader(preview)
 
     -- ── Line 2: Deaths (right) ────────────────────────────────────────────────
     -- Skull icon via inline WoW texture (avoids broken UTF-8 glyph)
-    local skullIcon = "|TInterface\Icons\spell_shadow_soulleech_3:13:13:0:-1|t"
+    local skullIcon = "|TInterface\\Icons\\spell_shadow_soulleech_3:13:13:0:-1|t"
     local deaths, timeLost = 0, 0
     if preview then
         deaths, timeLost = 1, 5
@@ -576,7 +576,8 @@ function TM:UpdateBossRows(preview)
                 kt = elapsed - cr.elapsed
                 self.bossKillTimes[i] = kt
             end
-            row.time:SetText(kt and ("|cFF55E210✔|r  " .. self:FormatTime(kt)) or "|cFF55E210✔|r")
+            local checkIcon = "|TInterface\\RAIDFRAME\\ReadyCheck-Ready:12:12:0:0|t"
+            row.time:SetText(kt and (checkIcon .. "  " .. self:FormatTime(kt)) or checkIcon)
             row.time:SetTextColor(unpack(C.TEXT_GREEN))
         else
             row.dot:SetColorTexture(0.30, 0.30, 0.30, 1)
