@@ -18,33 +18,33 @@ ns.TEX_LOCK      = ADDON_TEX .. "lock"
 ns.TEX_LOCK_OPEN = ADDON_TEX .. "lock-open"
 ns.TEX_CHEVRON   = ADDON_TEX .. "chevron"
 
--- Tomo palette (dark, clean)
-ns.BG              = { 0.04, 0.04, 0.05, 0.70 }
-ns.HEADER_BG       = { 0.07, 0.07, 0.09, 0.75 }
-ns.BORDER_COLOR     = { 0.0, 0.0, 0.0, 0.7 }
-ns.DEFAULT_ACCENT   = { 0.82, 0.71, 0.33 }       -- gold
-ns.ACCENT           = { 0.82, 0.71, 0.33, 0.8 }
+-- Tomo palette (dark blue, TomoMythic style)
+ns.BG              = { 0.00, 0.00, 0.00, 0.80 }
+ns.HEADER_BG       = { 0.04, 0.08, 0.16, 1.00 }
+ns.BORDER_COLOR     = { 0.25, 0.25, 0.30, 0.70 }
+ns.DEFAULT_ACCENT   = { 0.33, 0.70, 0.00 }       -- apple green
+ns.ACCENT           = { 0.33, 0.70, 0.00, 1.00 }
 
 -- Text
-ns.TEXT_PRIMARY     = { 1.0, 1.0, 1.0 }
-ns.TEXT_SECONDARY   = { 0.55, 0.55, 0.58 }
+ns.TEXT_PRIMARY     = { 1.00, 1.00, 1.00 }
+ns.TEXT_SECONDARY   = { 0.55, 0.55, 0.55 }
 ns.TEXT_LABEL       = { 0.75, 0.75, 0.78 }
 ns.TEXT_MUTED       = { 0.40, 0.40, 0.43 }
 
 -- Interactive
-ns.HOVER_BG         = { 0.30, 0.30, 0.33, 0.40 }
-ns.HEADER_HOVER_BG  = { 0.30, 0.30, 0.33, 0.40 }
-ns.BAR_ALPHA        = 0.4
+ns.HOVER_BG         = { 0.10, 0.22, 0.44, 0.40 }
+ns.HEADER_HOVER_BG  = { 0.10, 0.22, 0.44, 0.40 }
+ns.BAR_ALPHA        = 0.5
 ns.ICON_ALPHA       = 0.7
 
 -- Category colors (header label tint)
-ns.CAT_DAMAGE       = { 1.00, 0.40, 0.35 }
-ns.CAT_HEALING      = { 0.30, 0.90, 0.40 }
-ns.CAT_ACTIONS      = { 0.40, 0.70, 1.00 }
+ns.CAT_DAMAGE       = { 1.00, 0.30, 0.20 }
+ns.CAT_HEALING      = { 0.55, 0.90, 0.20 }
+ns.CAT_ACTIONS      = { 0.50, 0.72, 1.00 }
 
 -- Scrollbar
-ns.SCROLLBAR_TRACK  = { 0.10, 0.10, 0.12, 0.4 }
-ns.SCROLLBAR_THUMB  = { 0.35, 0.35, 0.40, 0.7 }
+ns.SCROLLBAR_TRACK  = { 0.04, 0.08, 0.14, 0.60 }
+ns.SCROLLBAR_THUMB  = { 0.15, 0.32, 0.60, 0.70 }
 
 -- Layout
 ns.HEADER_HEIGHT    = 20

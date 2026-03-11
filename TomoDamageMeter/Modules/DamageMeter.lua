@@ -95,7 +95,7 @@ function ns.CreateMeterWindow(cfg)
     -- Borders (subtle 1px)
     ----------------------------------------------------------------------
 
-    local borderColor = { 0.25, 0.25, 0.28, 0.8 }
+    local borderColor = ns.BORDER_COLOR
     local function MakeBorder(anchor1, frame1, rel, anchor2, frame2, rel2, width, height)
         local t = window:CreateTexture(nil, "OVERLAY")
         t:SetTexture(ns.FLAT)
@@ -147,7 +147,7 @@ function ns.CreateMeterWindow(cfg)
 
     -- Separator between subheader and breadcrumb header
     local headerSep = window:CreateTexture(nil, "OVERLAY")
-    headerSep:SetTexture(ns.FLAT); headerSep:SetVertexColor(0.25, 0.25, 0.28, 0.8)
+    headerSep:SetTexture(ns.FLAT); headerSep:SetVertexColor(unpack(ns.BORDER_COLOR))
     headerSep:SetHeight(1)
     headerSep:SetPoint("TOPLEFT", subHeader, "BOTTOMLEFT")
     headerSep:SetPoint("TOPRIGHT", subHeader, "BOTTOMRIGHT")
@@ -159,13 +159,12 @@ function ns.CreateMeterWindow(cfg)
     timerFS:SetJustifyH("RIGHT")
     timerFS:SetPoint("RIGHT", subHeader, "RIGHT", -ns.TEXT_PAD, ns.GetFontNudge())
 
-    -- Session text
+    -- Session text (centered)
     local sessionText = subHeader:CreateFontString(nil, "ARTWORK")
     sessionText:SetFont(ns.GetFont(), ns.BAR_FONT_SIZE, "OUTLINE")
     sessionText:SetTextColor(unpack(ns.TEXT_SECONDARY))
-    sessionText:SetPoint("LEFT", ns.TEXT_PAD, ns.GetFontNudge())
-    sessionText:SetPoint("RIGHT", timerFS, "LEFT", -ns.TEXT_PAD, 0)
-    sessionText:SetJustifyH("LEFT")
+    sessionText:SetPoint("CENTER", subHeader, "CENTER", 0, ns.GetFontNudge())
+    sessionText:SetJustifyH("CENTER")
     sessionText:SetWordWrap(false)
 
     subHeader:SetScript("OnEnter", function()
@@ -211,7 +210,7 @@ function ns.CreateMeterWindow(cfg)
     headerBG:SetPoint("TOPLEFT", header); headerBG:SetPoint("BOTTOMRIGHT", header)
 
     local headerSep2 = window:CreateTexture(nil, "OVERLAY")
-    headerSep2:SetTexture(ns.FLAT); headerSep2:SetVertexColor(0.25, 0.25, 0.28, 0.8)
+    headerSep2:SetTexture(ns.FLAT); headerSep2:SetVertexColor(unpack(ns.BORDER_COLOR))
     headerSep2:SetHeight(0.8)
     headerSep2:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 1, 0)
     headerSep2:SetPoint("TOPRIGHT", header, "BOTTOMRIGHT", -1, 0)
@@ -387,11 +386,11 @@ function ns.CreateMeterWindow(cfg)
     actionStrip:SetPoint("BOTTOMRIGHT", window, "BOTTOMRIGHT")
 
     local stripBG = actionStrip:CreateTexture(nil, "BACKGROUND")
-    stripBG:SetTexture(ns.FLAT); stripBG:SetVertexColor(0.04, 0.04, 0.04, 0.6)
+    stripBG:SetTexture(ns.FLAT); stripBG:SetVertexColor(0.04, 0.08, 0.14, 0.60)
     stripBG:SetAllPoints()
 
     local stripSep = actionStrip:CreateTexture(nil, "OVERLAY")
-    stripSep:SetTexture(ns.FLAT); stripSep:SetVertexColor(0.25, 0.25, 0.28, 0.8)
+    stripSep:SetTexture(ns.FLAT); stripSep:SetVertexColor(unpack(ns.BORDER_COLOR))
     stripSep:SetWidth(1)
     stripSep:SetPoint("TOPLEFT", actionStrip, "TOPLEFT")
     stripSep:SetPoint("BOTTOMLEFT", actionStrip, "BOTTOMLEFT")
@@ -835,7 +834,7 @@ function ns.CreateMeterWindow(cfg)
             sessionText:SetFont(font, ns.BAR_FONT_SIZE, "OUTLINE")
             catText:SetPoint("LEFT", ns.TEXT_PAD, nudge)
             typeText:SetPoint("LEFT", ns.TEXT_PAD, nudge)
-            sessionText:SetPoint("LEFT", ns.TEXT_PAD, nudge)
+            sessionText:SetPoint("CENTER", subHeader, "CENTER", 0, nudge)
             timerFS:SetPoint("RIGHT", subHeader, "RIGHT", -ns.TEXT_PAD, nudge)
             state.UpdateHeader()
         end,

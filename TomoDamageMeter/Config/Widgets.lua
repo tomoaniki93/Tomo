@@ -31,7 +31,8 @@ function ns.Widgets.CreateSlider(parent, label, min, max, step, getter, setter)
     slider:SetObeyStepOnDrag(true)
     slider:SetValue(getter())
 
-    valueText:SetText(string.format("%.1f", getter()))
+    local fmtStr = step < 1 and "%.2f" or "%.0f"
+    valueText:SetText(string.format(fmtStr, getter()))
 
     slider:SetScript("OnValueChanged", function(self, val)
         val = math.floor(val / step + 0.5) * step
@@ -50,10 +51,14 @@ end
 
 -- Checkbox widget
 function ns.Widgets.CreateCheckbox(parent, label, getter, setter)
-    local btn = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
-    btn:SetSize(24, 24)
+    local frame = CreateFrame("Frame", nil, parent)
+    frame:SetHeight(24)
 
-    local title = btn:CreateFontString(nil, "ARTWORK")
+    local btn = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+    btn:SetSize(24, 24)
+    btn:SetPoint("LEFT", 0, 0)
+
+    local title = frame:CreateFontString(nil, "ARTWORK")
     title:SetFont(ns.GetFont(), 11, "OUTLINE")
     title:SetTextColor(unpack(ns.TEXT_LABEL))
     title:SetPoint("LEFT", btn, "RIGHT", 4, 0)
@@ -64,11 +69,11 @@ function ns.Widgets.CreateCheckbox(parent, label, getter, setter)
         setter(self:GetChecked())
     end)
 
-    btn.Refresh = function()
+    frame.Refresh = function()
         btn:SetChecked(getter())
     end
 
-    return btn
+    return frame
 end
 
 -- Dropdown button (simple text cycling)
@@ -88,7 +93,7 @@ function ns.Widgets.CreateDropdown(parent, label, options, getter, setter)
 
     local btnBG = btn:CreateTexture(nil, "BACKGROUND")
     btnBG:SetTexture(ns.FLAT)
-    btnBG:SetVertexColor(0.12, 0.12, 0.14, 0.8)
+    btnBG:SetVertexColor(0.05, 0.12, 0.26, 0.92)
     btnBG:SetAllPoints()
 
     local btnText = btn:CreateFontString(nil, "ARTWORK")

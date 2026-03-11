@@ -41,27 +41,66 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
             end
         end
 
-        -- Window config (single window for now)
-        if not ns.db.window then
-            ns.db.window = {}
+        -- Migrate legacy single-window config to multi-window array
+        if ns.db.window and not ns.db.windowConfigs then
+            ns.db.windowConfigs = { ns.db.window }
+            ns.db.window = nil
         end
-        local cfg = ns.db.window
-        for k, v in pairs(ns.DEFAULTS) do
-            if cfg[k] == nil then cfg[k] = type(v) == "table" and CopyTable(v) or v end
+        if not ns.db.windowConfigs or #ns.db.windowConfigs == 0 then
+            ns.db.windowConfigs = { {} }
         end
 
-        -- Create the main window
-        local win = ns.CreateMeterWindow(cfg)
-        table.insert(ns.windows, win)
-        win.Refresh()
-        C_Timer.After(0, win.UpdateHeader)
+        -- Create all saved windows
+        for _, cfg in ipairs(ns.db.windowConfigs) do
+            for k, v in pairs(ns.DEFAULTS) do
+                if cfg[k] == nil then cfg[k] = type(v) == "table" and CopyTable(v) or v end
+            end
+            local win = ns.CreateMeterWindow(cfg)
+            table.insert(ns.windows, win)
+            win.Refresh()
+            C_Timer.After(0, win.UpdateHeader)
+        end
 
     elseif event == "PLAYER_LOGOUT" then
-        if ns.db and ns.windows[1] then
-            ns.windows[1].SavePosition()
+        if ns.db then
+            for _, win in ipairs(ns.windows) do
+                win.SavePosition()
+            end
         end
     end
 end)
+
+----------------------------------------------------------------------
+-- Multi-Window Management
+----------------------------------------------------------------------
+
+function ns.CreateNewWindow()
+    if #ns.windows >= ns.MAX_WINDOWS then return false end
+    local cfg = {}
+    for k, v in pairs(ns.DEFAULTS) do
+        cfg[k] = type(v) == "table" and CopyTable(v) or v
+    end
+    -- Offset new windows so they don't stack exactly on top
+    cfg.x = cfg.x + 30 * #ns.windows
+    cfg.y = cfg.y - 30 * #ns.windows
+    table.insert(ns.db.windowConfigs, cfg)
+    local win = ns.CreateMeterWindow(cfg)
+    table.insert(ns.windows, win)
+    win.Refresh()
+    C_Timer.After(0, win.UpdateHeader)
+    return true
+end
+
+function ns.RemoveWindow(index)
+    if #ns.windows <= 1 then return false end
+    index = index or #ns.windows
+    local win = ns.windows[index]
+    if not win then return false end
+    win.frame:Hide()
+    table.remove(ns.windows, index)
+    table.remove(ns.db.windowConfigs, index)
+    return true
+end
 
 ----------------------------------------------------------------------
 -- Combat Events

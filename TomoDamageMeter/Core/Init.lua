@@ -65,6 +65,8 @@ end
 -- Default Window Config
 ----------------------------------------------------------------------
 
+ns.MAX_WINDOWS = 3
+
 ns.DEFAULTS = {
     point = "CENTER",
     relPoint = "CENTER",
@@ -82,8 +84,8 @@ ns.DEFAULTS = {
 ----------------------------------------------------------------------
 
 ns.DEFAULT_COLUMNS = {
-    { key = "rate",  show = true,  fmt = "full" },
-    { key = "total", show = true,  fmt = "full" },
+    { key = "rate",  show = true,  fmt = "1dec" },
+    { key = "total", show = true,  fmt = "1dec" },
     { key = "pct",   show = false, fmt = "int" },
 }
 

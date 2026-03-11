@@ -68,6 +68,9 @@ local FORMAT_CHARS = {
     dec   = 6,
 }
 
+-- Extra chars for the total column (parentheses)
+local TOTAL_EXTRA_CHARS = 2
+
 local charWidthCache = {}
 local measureFS = nil
 
@@ -138,7 +141,7 @@ function ns.PopulateColumnValues(button, elementData)
             fs:SetText(ns.FormatNumber(rate, col.fmt))
             fs:Show()
         elseif col.show and col.key == "total" then
-            fs:SetText(ns.FormatNumber(total, col.fmt))
+            fs:SetText("(" .. ns.FormatNumber(total, col.fmt) .. ")")
             fs:Show()
         elseif col.show and col.key == "pct" and not issecretvalue(total)
             and sessionTotal and not issecretvalue(sessionTotal) and sessionTotal > 0 then
@@ -171,7 +174,9 @@ function ns.AnchorColumns(button)
         local col = ns.db.columns[i]
         if col.show then
             local fs = fsMap[col.key]
-            fs:SetWidth(ColPixelWidth(FORMAT_CHARS[col.fmt] or 6, fontSize))
+            local chars = FORMAT_CHARS[col.fmt] or 6
+            if col.key == "total" then chars = chars + TOTAL_EXTRA_CHARS end
+            fs:SetWidth(ColPixelWidth(chars, fontSize))
             if not prevFS then
                 fs:SetPoint("RIGHT", button.bar, "RIGHT", -4, ns.GetFontNudge())
             else

@@ -9,7 +9,7 @@ local settingsFrame = nil
 
 local function CreateSettingsPanel()
     local frame = CreateFrame("Frame", "TomoDamageMeterSettings", UIParent, "BackdropTemplate")
-    frame:SetSize(340, 420)
+    frame:SetSize(340, 520)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
     frame:SetMovable(true)
@@ -24,8 +24,8 @@ local function CreateSettingsPanel()
         edgeFile = ns.FLAT,
         edgeSize = 1,
     })
-    frame:SetBackdropColor(0.06, 0.06, 0.08, 0.95)
-    frame:SetBackdropBorderColor(0.25, 0.25, 0.28, 0.8)
+    frame:SetBackdropColor(0.00, 0.00, 0.00, 0.88)
+    frame:SetBackdropBorderColor(ns.BORDER_COLOR[1], ns.BORDER_COLOR[2], ns.BORDER_COLOR[3], ns.BORDER_COLOR[4])
 
     -- Title
     local title = frame:CreateFontString(nil, "ARTWORK")
@@ -174,6 +174,87 @@ local function CreateSettingsPanel()
         function() return ns.db.reportLines end,
         function(val) ns.db.reportLines = val end)
     AddWidget(linesSlider, 50)
+
+    ----------------------------------------------------------------------
+    -- Windows
+    ----------------------------------------------------------------------
+    AddSection(L["SETTINGS_WINDOWS"])
+
+    local windowFrame = CreateFrame("Frame", nil, content)
+    windowFrame:SetHeight(30)
+
+    local windowCountFS = windowFrame:CreateFontString(nil, "ARTWORK")
+    windowCountFS:SetFont(ns.GetFont(), 11, "OUTLINE")
+    windowCountFS:SetTextColor(unpack(ns.TEXT_LABEL))
+    windowCountFS:SetPoint("LEFT", 0, 0)
+
+    local addBtn = CreateFrame("Button", nil, windowFrame)
+    addBtn:SetSize(80, 22)
+    addBtn:SetPoint("RIGHT", windowFrame, "RIGHT", 0, 0)
+
+    local addBtnBG = addBtn:CreateTexture(nil, "BACKGROUND")
+    addBtnBG:SetTexture(ns.FLAT)
+    addBtnBG:SetVertexColor(0.05, 0.12, 0.26, 0.92)
+    addBtnBG:SetAllPoints()
+
+    local addBtnText = addBtn:CreateFontString(nil, "ARTWORK")
+    addBtnText:SetFont(ns.GetFont(), 10, "OUTLINE")
+    addBtnText:SetTextColor(unpack(ns.TEXT_PRIMARY))
+    addBtnText:SetPoint("CENTER")
+    addBtnText:SetText(L["SETTINGS_ADD_WINDOW"])
+
+    local addHL = addBtn:CreateTexture(nil, "HIGHLIGHT")
+    addHL:SetTexture(ns.FLAT); addHL:SetVertexColor(1, 1, 1, 0.08)
+    addHL:SetAllPoints()
+
+    local removeBtn = CreateFrame("Button", nil, windowFrame)
+    removeBtn:SetSize(80, 22)
+    removeBtn:SetPoint("RIGHT", addBtn, "LEFT", -4, 0)
+
+    local removeBtnBG = removeBtn:CreateTexture(nil, "BACKGROUND")
+    removeBtnBG:SetTexture(ns.FLAT)
+    removeBtnBG:SetVertexColor(0.05, 0.12, 0.26, 0.92)
+    removeBtnBG:SetAllPoints()
+
+    local removeBtnText = removeBtn:CreateFontString(nil, "ARTWORK")
+    removeBtnText:SetFont(ns.GetFont(), 10, "OUTLINE")
+    removeBtnText:SetTextColor(unpack(ns.TEXT_PRIMARY))
+    removeBtnText:SetPoint("CENTER")
+    removeBtnText:SetText(L["SETTINGS_REMOVE_WINDOW"])
+
+    local removeHL = removeBtn:CreateTexture(nil, "HIGHLIGHT")
+    removeHL:SetTexture(ns.FLAT); removeHL:SetVertexColor(1, 1, 1, 0.08)
+    removeHL:SetAllPoints()
+
+    local function UpdateWindowButtons()
+        local count = #ns.windows
+        windowCountFS:SetText(string.format(L["SETTINGS_WINDOW_COUNT"], count, ns.MAX_WINDOWS))
+        if count >= ns.MAX_WINDOWS then
+            addBtnText:SetTextColor(unpack(ns.TEXT_MUTED))
+        else
+            addBtnText:SetTextColor(unpack(ns.TEXT_PRIMARY))
+        end
+        if count <= 1 then
+            removeBtnText:SetTextColor(unpack(ns.TEXT_MUTED))
+        else
+            removeBtnText:SetTextColor(unpack(ns.TEXT_PRIMARY))
+        end
+    end
+    UpdateWindowButtons()
+
+    addBtn:SetScript("OnClick", function()
+        if #ns.windows >= ns.MAX_WINDOWS then return end
+        ns.CreateNewWindow()
+        UpdateWindowButtons()
+    end)
+
+    removeBtn:SetScript("OnClick", function()
+        if #ns.windows <= 1 then return end
+        ns.RemoveWindow()
+        UpdateWindowButtons()
+    end)
+
+    AddWidget(windowFrame, 30)
 
     frame:Hide()
     return frame
