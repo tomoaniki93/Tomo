@@ -133,6 +133,9 @@ SlashCmdList["TOMOMYTHIC"] = function(msg)
     msg = strtrim(msg or ""):lower()
     local L = TM.L
     if     msg == ""        then TM:ToggleConfig()
+    elseif msg:find("^interrupt") then
+        local sub = msg:match("^interrupt%s*(.*)$") or ""
+        TM:InterruptCommand(sub)
     elseif msg == "unlock"  then TM:SetMovable(true);  print(L.UNLOCK_MSG)
     elseif msg == "lock"    then TM:SetMovable(false); print(L.LOCK_MSG)
     elseif msg == "reset"   then TM:ResetPosition();   print(L.RESET_MSG)

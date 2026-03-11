@@ -11,6 +11,22 @@ TM.Defaults = {
     showTimer    = true,
     showForces   = true,
     showBosses   = true,
+    interrupt    = {
+        frameWidth      = 220,
+        barHeight       = 28,
+        locked          = false,
+        showTitle       = true,
+        growUp          = false,
+        alpha           = 0.9,
+        nameFontSize    = 0,
+        readyFontSize   = 0,
+        showReady       = true,
+        showInDungeon   = true,
+        showInRaid      = false,
+        showInOpenWorld = true,
+        showInArena     = false,
+        showInBG        = false,
+    },
 }
 
 function TM:InitDB()
