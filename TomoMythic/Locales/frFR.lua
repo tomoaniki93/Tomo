@@ -33,3 +33,6 @@ L.CFG_PREVIEW         = "Aperçu"
 L.CFG_SECTION_DISPLAY = "Affichage"
 L.CFG_SECTION_FRAME   = "Cadre"
 L.CFG_SECTION_ACTIONS = "Actions"
+
+L.INTERRUPT_READY     = "Pr\195\170t"
+L.CFG_SHOW_READY      = "Afficher pr\195\170t"

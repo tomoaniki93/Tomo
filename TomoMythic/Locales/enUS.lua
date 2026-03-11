@@ -42,4 +42,7 @@ TM.L = {
     CFG_SECTION_DISPLAY = "Display",
     CFG_SECTION_FRAME   = "Frame",
     CFG_SECTION_ACTIONS = "Actions",
+
+    INTERRUPT_READY     = "Ready",
+    CFG_SHOW_READY      = "Show ready",
 }

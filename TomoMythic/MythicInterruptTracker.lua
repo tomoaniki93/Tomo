@@ -176,7 +176,7 @@ local function MITDebug(msg)
 end
 
 local function ResolveAlias(spellID)
-    return SPELL_ALIASES[spellID] or spellID
+    return spellID and (SPELL_ALIASES[spellID] or spellID) or nil
 end
 
 local function GetPrimaryInterruptForClass(class)
@@ -465,6 +465,7 @@ end
 ------------------------------------------------------------
 
 local function OnSpellCastSucceeded(unit, _, spellID)
+    if not spellID then return end
     spellID = ResolveAlias(spellID)
     if not ALL_INTERRUPTS[spellID] then return end
 
@@ -582,28 +583,45 @@ local function CreateBarRow(parent, unit)
     fill:SetStatusBarColor(0.5, 0.5, 0.5, 0.85)
     row.fill = fill
 
-    -- Spell icon
-    local icon = row:CreateTexture(nil, "ARTWORK")
+    -- Spell icon (on fill at OVERLAY so class colour doesn't tint it)
+    local icon = fill:CreateTexture(nil, "OVERLAY")
     icon:SetSize(H - 4, H - 4)
     icon:SetPoint("LEFT", row, "LEFT", 2, 0)
     icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
     row.icon = icon
 
-    -- Player name
-    local nameFS = TM:MakeFS(row, (db.nameFontSize ~= 0 and db.nameFontSize or 11),
-        "OUTLINE", "LEFT", nil, H + 2, 0)
+    -- Player name (parented to fill so it renders above the class-coloured bar)
+    local nameFS = TM:MakeFS(fill, (db.nameFontSize ~= 0 and db.nameFontSize or 11),
+        "OUTLINE", "LEFT", row, H + 2, 0)
     nameFS:SetWidth(W - H - 50)
     nameFS:SetJustifyH("LEFT")
     nameFS:SetTextColor(unpack(C.TEXT_WHITE))
     row.nameFS = nameFS
 
-    -- CD / ready text (right aligned)
-    local cdFS = TM:MakeFS(row, (db.readyFontSize ~= 0 and db.readyFontSize or 10),
-        "OUTLINE", "RIGHT", nil, -3, 0)
+    -- CD / ready text (right aligned, parented to fill)
+    local cdFS = TM:MakeFS(fill, (db.readyFontSize ~= 0 and db.readyFontSize or 10),
+        "OUTLINE", "RIGHT", row, -3, 0)
     row.cdFS = cdFS
 
     -- 1px border lines
     TM:MakeLineBorders(row, unpack(C.BORDER))
+
+    -- Smooth per-frame fill update when on cooldown
+    row:SetScript("OnUpdate", function(self)
+        local data = MIT.playerData[self.unit]
+        if not data or data.ready or not data.spellID then return end
+        local remaining = math.max(0, data.expires - GetTime())
+        local frac = 1 - (remaining / math.max(1, data.cd))
+        self.fill:SetValue(frac)
+        if remaining > 0 then
+            self.cdFS:SetText(string.format("|cFFFF4422%.1fs|r", remaining))
+        else
+            self.cdFS:SetText("|cFF55DD22" .. TM.L.INTERRUPT_READY .. "|r")
+            data.ready   = true
+            data.expires = 0
+            self.fill:SetValue(1)
+        end
+    end)
 
     row.unit = unit
     return row
@@ -626,7 +644,6 @@ function TM:MIT_BuildFrame()
     F:SetFrameLevel(60)
     F:SetClampedToScreen(true)
     F:SetAlpha(db.alpha or 0.9)
-    F:SetResizable(true)
 
     -- Restore saved position (if any)
     if db.posAnchor then
@@ -673,24 +690,6 @@ function TM:MIT_BuildFrame()
 
         F.titleHeight = 21
     end
-
-    -- Corner resize handle
-    local resizer = CreateFrame("Button", nil, F)
-    resizer:SetSize(12, 12)
-    resizer:SetPoint("BOTTOMRIGHT", F, "BOTTOMRIGHT", 0, 0)
-    resizer:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
-    resizer:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
-    resizer:SetScript("OnMouseDown", function(_, button)
-        if button == "LeftButton" and not db.locked then
-            F:StartSizing("BOTTOMRIGHT")
-        end
-    end)
-    resizer:SetScript("OnMouseUp", function()
-        F:StopMovingOrSizing()
-        db.frameWidth = math.max(140, math.floor(F:GetWidth()))
-        self:MIT_LayoutFrame()
-    end)
-    F.resizer = resizer
 
     -- Dragging
     if not db.locked then
@@ -797,7 +796,7 @@ function TM:MIT_RefreshBars()
                 -- Ready
                 bar.fill:SetValue(1)
                 if db.showReady then
-                    bar.cdFS:SetText("|cFF55DD22✓|r")
+                    bar.cdFS:SetText("|cFF55DD22" .. TM.L.INTERRUPT_READY .. "|r")
                 else
                     bar.cdFS:SetText("")
                 end
@@ -809,7 +808,7 @@ function TM:MIT_RefreshBars()
                 if remaining > 0 then
                     bar.cdFS:SetText(string.format("|cFFFF4422%.0fs|r", remaining))
                 else
-                    bar.cdFS:SetText("|cFF55DD22✓|r")
+                    bar.cdFS:SetText("|cFF55DD22" .. TM.L.INTERRUPT_READY .. "|r")
                     data.ready   = true
                     data.expires = 0
                 end
@@ -970,7 +969,7 @@ local function BuildConfigPanel()
         end
     end) ; y = y - 24
     CB("Grow upward",    y, "growUp",    function() TM:MIT_LayoutFrame() end) ; y = y - 24
-    CB("Show ready (✓)", y, "showReady", function() TM:MIT_RefreshBars() end) ; y = y - 34
+    CB(TM.L.CFG_SHOW_READY, y, "showReady", function() TM:MIT_RefreshBars() end) ; y = y - 34
 
     SectionHdr("SHOW IN...", y) ; y = y - 20
     CB("Dungeon (M+)",   y, "showInDungeon",   nil) ; y = y - 24
