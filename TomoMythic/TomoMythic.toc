@@ -16,5 +16,6 @@ Database.lua
 Core.lua
 Blizzard.lua
 Display.lua
+MythicInterruptTracker.lua
 Events.lua
 Config.lua

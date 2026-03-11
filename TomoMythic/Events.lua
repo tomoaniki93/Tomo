@@ -44,6 +44,7 @@ function TM:OnEvent(event, ...)
             self:InitDB()
             self:BuildFrame()
             self:InitBlizzardSuppress()
+            self:InitInterruptTracker()
             local p = self.db.position
             self.Frame:ClearAllPoints()
             self.Frame:SetPoint(p.anchor, UIParent, p.relTo, p.x, p.y)
@@ -53,6 +54,7 @@ function TM:OnEvent(event, ...)
     -- ── PLAYER_ENTERING_WORLD ─────────────────────────────────────────────────
     elseif event == "PLAYER_ENTERING_WORLD" then
         C_MythicPlus.RequestMapInfo()
+        self:OnInterruptEnterWorld()
         if C_ChallengeMode.IsChallengeModeActive() then
             -- Already in a key (reload inside dungeon)
             self:SuppressBlizzardUI()
