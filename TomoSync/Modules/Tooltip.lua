@@ -226,6 +226,18 @@ end
 -- ============================================================
 
 function Tooltip:OnInitialize()
+    -- Purge automatique des entrées de cache expirées toutes les 30s.
+    -- Sans cela, les entrées > 5s restent indéfiniment en mémoire jusqu'au
+    -- prochain ResetCache() (scan de sacs ou changement de paramètre).
+    C_Timer.NewTicker(30, function()
+        local now = GetTime()
+        for id, c in pairs(tooltipCache) do
+            if (now - c.time) >= CACHE_MAX_AGE then
+                tooltipCache[id] = nil
+            end
+        end
+    end)
+
     -- Hook sur SetItem (survol d'item dans les sacs, inventaire, etc.)
     if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall then
         -- Retail TWW : méthode moderne

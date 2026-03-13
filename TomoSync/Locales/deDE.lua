@@ -1,0 +1,29 @@
+-- TomoSync | Lokalisierung Deutsch
+if GetLocale() ~= "deDE" then return end
+
+TomoSyncLocale = {
+    ADDON_NAME      = "TomoSync",
+    BAGS            = "Taschen",
+    BANK            = "Bank",
+    REAGENT         = "Reagenzien",
+    EQUIPPED        = "Angelegt",
+    TOTAL           = "Gesamt",
+    LAST_SCAN       = "Letzter Scan",
+    NEVER           = "Nie",
+    NO_DATA         = "Keine Daten",
+    -- Config
+    CFG_TITLE       = "TomoSync — Einstellungen",
+    CFG_SHOW_BAGS   = "Taschen anzeigen",
+    CFG_SHOW_BANK   = "Bank anzeigen",
+    CFG_SHOW_REAGENT= "Reagenzienlager anzeigen",
+    CFG_SHOW_EQUIP  = "Angelegte Gegenstände anzeigen",
+    CFG_SHOW_TOTAL  = "Gesamtanzahl anzeigen",
+    CFG_ONLY_REALM  = "Nur gleiches Realm",
+    CFG_THRESHOLD   = "Mindestanzeigewert",
+    CFG_THRESHOLD_TT= "Zeigt einen Charakter im Tooltip nur an, wenn sein Gesamtwert diesen Wert übersteigt.",
+    -- Messages
+    SCAN_BAGS_DONE  = "Taschen gescannt.",
+    SCAN_BANK_DONE  = "Bank gescannt.",
+    SCAN_REAGENT_DONE = "Reagenzienlager gescannt.",
+    CMD_HELP        = "Befehle: /tms scan — Taschensccan erzwingen.",
+}

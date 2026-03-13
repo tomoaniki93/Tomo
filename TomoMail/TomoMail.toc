@@ -1,5 +1,5 @@
-## Interface: 120001, 120000
-## Title: |cFFFFCC00Tomo|r|cFFFFFFFFMail|r
+## Interface: 120005, 120001, 120000
+## Title: |cffCC44FFTomo|r|cffFFFFFFMail|r
 ## Notes: Gestionnaire de courrier avancé — Alts, Guilde, Envoi rapide
 ## Notes-frFR: Gestionnaire de courrier avancé — Alts, Guilde, Envoi rapide
 ## Notes-enUS: Advanced mail manager — Alts, Guild, Quick Send
@@ -7,9 +7,14 @@
 ## Version: 1.0.0
 ## SavedVariables: TomoMailDB
 ## Category: |cffCC44FFTomo|r|cffFFFFFFSuite|r
+## IconTexture: Interface\Icons\Inv_misc_blizzcon09_poster
 
 Locales\frFR.lua
 Locales\enUS.lua
+Locales\deDE.lua
+Locales\esES.lua
+Locales\itIT.lua
+Locales\ptBR.lua
 
 Database.lua
 Core.lua

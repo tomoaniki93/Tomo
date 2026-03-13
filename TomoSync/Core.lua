@@ -78,13 +78,6 @@ local function InitDB()
         TomoSyncDB = {}
     end
 
-    -- Settings par personnage
-    local settingsKey = "TomoSyncSettings_" .. UnitName("player") .. "_" .. GetRealmName()
-    if type(_G[settingsKey]) ~= "table" then
-        _G[settingsKey] = {}
-    end
-    MergeDefaults(_G[settingsKey], TomoSyncDB_Defaults)
-
     TS.realm    = GetRealmName()
     TS.charName = UnitName("player")
 
@@ -99,6 +92,14 @@ local function InitDB()
     local charEntry = TomoSyncDB[TS.realm][TS.charName]
     if not charEntry.items then charEntry.items = {} end
 
+    -- Settings par personnage — stockés dans TomoSyncDB (déclaré en SavedVariables)
+    -- pour garantir leur persistance. L'ancienne clé globale _G["TomoSyncSettings_*"]
+    -- n'était pas dans le .toc et ne survivait pas aux redémarrages du jeu.
+    if type(charEntry.settings) ~= "table" then
+        charEntry.settings = {}
+    end
+    MergeDefaults(charEntry.settings, TomoSyncDB_Defaults)
+
     -- Met à jour les infos du personnage
     local _, class = UnitClass("player")
     charEntry.class = class
@@ -106,7 +107,7 @@ local function InitDB()
 
     TS.db = {
         global   = TomoSyncDB,
-        settings = _G[settingsKey],
+        settings = charEntry.settings,
         char     = charEntry,
     }
 end

@@ -1,9 +1,9 @@
 -- TomoPorter | TomoPorter.lua
--- Addon standalone — téléporteurs donjon/raid disponibles
--- Auteur : Tomo | Version 1.2.0
+-- Addon standalone — téléporteurs donjon/raid + sorts Mage
+-- Auteur : Tomo | Version 1.3.2
 -- Thème : Cyan
 --
--- /porter  ou  /tp  → ouvre/ferme la fenêtre
+-- /porter  ou  /tpt  → ouvre/ferme la fenêtre
 
 TomoPorter = TomoPorter or {}
 
@@ -21,6 +21,8 @@ local CYAN = {
     bgBtnOff    = { 0.04, 0.07, 0.10, 0.50 },
     bgTabActive = { 0.03, 0.28, 0.38, 1    },
     bgTabIdle   = { 0.04, 0.10, 0.15, 1    },
+    bgCatActive = { 0.05, 0.22, 0.34, 1    },
+    bgCatIdle   = { 0.03, 0.08, 0.12, 1    },
     bgSep       = { 0.05, 0.22, 0.30, 1    },
     border      = { 0.10, 0.55, 0.70, 0.80 },
     borderDim   = { 0.07, 0.30, 0.40, 0.60 },
@@ -30,6 +32,8 @@ local CYAN = {
     textTitle   = { 0.30, 0.90, 1.00, 1    },
     textTabOn   = { 0.20, 1.00, 1.00, 1    },
     textTabOff  = { 0.55, 0.75, 0.80, 1    },
+    textCatOn   = { 0.20, 1.00, 1.00, 1    },
+    textCatOff  = { 0.45, 0.70, 0.80, 1    },
 }
 
 -- =========================================================
@@ -45,41 +49,35 @@ local CFG = {
     iconSz  = 22,
     tabH    = 22,
     headerH = 20,
+    catTabH = 26,   -- hauteur de la ligne d'onglets de catégorie (Téléporteurs / Mage)
+    catTabW = 115,  -- largeur d'un onglet de catégorie
 }
 
 -- =========================================================
 -- LISTE GLOBALE DES BOUTONS TP (pour le refresh)
 -- =========================================================
--- Chaque bouton créé est enregistré ici pour pouvoir être
--- rafraîchi par RefreshAllButtons() hors combat.
 TomoPorter.allButtons = {}
 
 -- =========================================================
 -- HELPERS API
 -- =========================================================
-
--- IsPlayerSpell est plus fiable qu'IsSpellKnown pour les téléporteurs
--- (pattern identique à TomoMod MythicKeys)
 local function HasTeleport(spellID)
     if not spellID then return false end
     if IsPlayerSpell then return IsPlayerSpell(spellID) end
     return false
 end
 
--- Récupère l'icône d'un sort avec pcall (valeurs secrètes TWW)
 local function GetSpellIcon(spellID)
     if not spellID then return nil end
     if C_Spell and C_Spell.GetSpellTexture then
         local ok, tex = pcall(C_Spell.GetSpellTexture, spellID)
         if ok and tex then return tex end
     end
-    -- GetSpellTexture (global) removed in 12.x — C_Spell.GetSpellTexture is the only API
     return nil
 end
 
 -- =========================================================
--- REFRESH D'UN BOUTON (état owned/non owned)
--- Doit être appelé hors combat (InCombatLockdown check à l'appelant)
+-- REFRESH D'UN BOUTON
 -- =========================================================
 local function RefreshButton(btn)
     local spellID = btn.tpSpellID
@@ -87,7 +85,6 @@ local function RefreshButton(btn)
     btn.tpOwned   = owned
 
     if owned then
-        -- Active le cast sécurisé
         btn:SetAttribute("type",  "spell")
         btn:SetAttribute("spell", spellID)
         btn.tpBg:SetVertexColor(unpack(CYAN.bgBtn))
@@ -95,7 +92,6 @@ local function RefreshButton(btn)
         btn.tpIcon:SetAlpha(1)
         btn.tpLabel:SetTextColor(unpack(CYAN.textMain))
     else
-        -- Désactive le cast sécurisé
         btn:SetAttribute("type",  nil)
         btn:SetAttribute("spell", nil)
         btn.tpBg:SetVertexColor(unpack(CYAN.bgBtnOff))
@@ -109,7 +105,6 @@ local function RefreshButton(btn)
     end
 end
 
--- Rafraîchit tous les boutons enregistrés (hors combat uniquement)
 local function RefreshAllButtons()
     if InCombatLockdown() then return end
     for _, btn in ipairs(TomoPorter.allButtons) do
@@ -192,19 +187,21 @@ local function CreateMainFrame()
     SetBG(closeBtn, 0.55, 0.05, 0.05, 0.8)
     local xTxt = closeBtn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     xTxt:SetAllPoints()
-    xTxt:SetText("✕")
+    xTxt:SetText("X")
     xTxt:SetTextColor(1, 0.6, 0.6, 1)
     closeBtn:SetScript("OnEnter", function() closeBtn.bgTex:SetVertexColor(0.85, 0.10, 0.10, 1) end)
     closeBtn:SetScript("OnLeave", function() closeBtn.bgTex:SetVertexColor(0.55, 0.05, 0.05, 0.8) end)
     closeBtn:SetScript("OnClick", function() f:Hide() end)
 
     -- Séparateur vertical central
+    -- (sera repositionné après la bande d'onglets de catégorie)
     local vsep = f:CreateTexture(nil, "BACKGROUND")
     vsep:SetWidth(1)
-    vsep:SetPoint("TOP",    f, "TOP",    0, -28)
+    vsep:SetPoint("TOP",    f, "TOP",    0, -(28 + CFG.catTabH + 1))
     vsep:SetPoint("BOTTOM", f, "BOTTOM", 0, 6)
     vsep:SetTexture("Interface/Buttons/WHITE8X8")
     vsep:SetVertexColor(unpack(CYAN.borderDim))
+    f.vsep = vsep
 
     return f
 end
@@ -212,33 +209,23 @@ end
 -- =========================================================
 -- BOUTON DE TÉLÉPORT
 -- =========================================================
--- Pattern identique à TomoMod MythicKeys :
---   • SecureActionButtonTemplate TOUJOURS (pas conditionnel)
---   • RegisterForClicks("AnyUp", "AnyDown") obligatoire
---   • Attributs type/spell définis par RefreshButton() hors combat
---   • OnEnter/OnLeave : scripts non protégés, pas de problème
--- =========================================================
 local function CreateTeleportButton(parent, entry, yOff)
     local spellID = entry.spellID
 
-    -- Toujours SecureActionButtonTemplate + RegisterForClicks
     local btn = CreateFrame("Button", nil, parent, "SecureActionButtonTemplate")
     btn:RegisterForClicks("AnyUp", "AnyDown")
     btn:SetSize(CFG.colW - 6, CFG.btnH)
     btn:SetPoint("TOPLEFT", parent, "TOPLEFT", 3, -yOff)
 
-    -- Données stockées sur le bouton (pattern TomoMod)
     btn.tpSpellID = spellID
     btn.tpOwned   = false
 
-    -- Fond (référence stockée pour le refresh)
     local bg = btn:CreateTexture(nil, "BACKGROUND")
     bg:SetAllPoints()
     bg:SetTexture("Interface/Buttons/WHITE8X8")
-    bg:SetVertexColor(unpack(CYAN.bgBtnOff))  -- état initial : désactivé
+    bg:SetVertexColor(unpack(CYAN.bgBtnOff))
     btn.tpBg = bg
 
-    -- Ligne de bord bas
     local bline = btn:CreateTexture(nil, "BORDER")
     bline:SetHeight(1)
     bline:SetPoint("BOTTOMLEFT",  btn, "BOTTOMLEFT",  0, 0)
@@ -246,7 +233,6 @@ local function CreateTeleportButton(parent, entry, yOff)
     bline:SetTexture("Interface/Buttons/WHITE8X8")
     bline:SetVertexColor(unpack(CYAN.borderDim))
 
-    -- Icône (référence stockée pour le refresh)
     local icon = btn:CreateTexture(nil, "ARTWORK")
     icon:SetSize(CFG.iconSz, CFG.iconSz)
     icon:SetPoint("LEFT", btn, "LEFT", 4, 0)
@@ -261,7 +247,6 @@ local function CreateTeleportButton(parent, entry, yOff)
     icon:SetAlpha(0.35)
     btn.tpIcon = icon
 
-    -- Texte (référence stockée pour le refresh)
     local lbl = btn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     lbl:SetPoint("LEFT",  icon, "RIGHT", 5, 0)
     lbl:SetPoint("RIGHT", btn,  "RIGHT", -4, 0)
@@ -270,7 +255,6 @@ local function CreateTeleportButton(parent, entry, yOff)
     lbl:SetTextColor(unpack(CYAN.textDim))
     btn.tpLabel = lbl
 
-    -- Tooltip (OnEnter/OnLeave : non protégés, OK)
     btn:SetScript("OnEnter", function(self)
         if self.tpOwned then
             self.tpBg:SetVertexColor(unpack(CYAN.bgBtnHover))
@@ -298,10 +282,8 @@ local function CreateTeleportButton(parent, entry, yOff)
         GameTooltip:Hide()
     end)
 
-    -- Enregistrement global pour RefreshAllButtons()
     table.insert(TomoPorter.allButtons, btn)
 
-    -- Refresh immédiat si hors combat (définit les attributs sécurisés)
     if not InCombatLockdown() then
         RefreshButton(btn)
     end
@@ -365,38 +347,170 @@ local function CreateGroupHeader(parent, label, yOff)
 end
 
 -- =========================================================
--- SCROLL FRAME
+-- SCROLL FRAME — scrollbar custom (thème cyan)
 -- =========================================================
+-- Architecture :
+--   • sf          = ScrollFrame pur (pas de template WoW)
+--   • track       = fond de la scrollbar (rail fixe à droite du sf)
+--   • thumb       = curseur draggable
+--   • content     = ScrollChild dont la hauteur est mise à jour
+--     par PopulateColumn/BuildMageColumn → UpdateScrollBar() recalcule
+-- La scrollbar se cache automatiquement quand le contenu tient dans la vue.
+-- =========================================================
+local SB_W     = 5   -- largeur du rail + curseur
+local SB_GAP   = 3   -- espace entre le contenu et le rail
+
 local function CreateScrollFrame(parent, x, y, w)
-    local sf = CreateFrame("ScrollFrame", nil, parent, "UIPanelScrollFrameTemplate")
+    -- ── ScrollFrame pur ──────────────────────────────────
+    local sf = CreateFrame("ScrollFrame", nil, parent)
     sf:SetPoint("TOPLEFT",    parent, "TOPLEFT",    x, y)
     sf:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", x, 6)
-    sf:SetWidth(w)
+    -- La largeur utile du SF laisse de la place pour le rail à droite
+    sf:SetWidth(w - SB_W - SB_GAP)
 
-    local sb = sf.ScrollBar
-    if sb then
-        sb:SetWidth(8)
-        sb:ClearAllPoints()
-        sb:SetPoint("TOPRIGHT",    sf, "TOPRIGHT",    10, -16)
-        sb:SetPoint("BOTTOMRIGHT", sf, "BOTTOMRIGHT", 10,  16)
-        if sb.ScrollUpButton   then sb.ScrollUpButton:Hide()   end
-        if sb.ScrollDownButton then sb.ScrollDownButton:Hide() end
-    end
-
+    -- ── Contenu scrollable ───────────────────────────────
     local content = CreateFrame("Frame", nil, sf)
-    content:SetWidth(w - 14)
+    content:SetWidth(sf:GetWidth())
     content:SetHeight(1)
     sf:SetScrollChild(content)
+
+    -- ── Rail (track) ─────────────────────────────────────
+    local track = CreateFrame("Frame", nil, parent)
+    track:SetWidth(SB_W)
+    track:SetPoint("TOPLEFT",    sf, "TOPRIGHT",    SB_GAP, 0)
+    track:SetPoint("BOTTOMLEFT", sf, "BOTTOMRIGHT", SB_GAP, 0)
+
+    local trackBg = track:CreateTexture(nil, "BACKGROUND")
+    trackBg:SetAllPoints()
+    trackBg:SetTexture("Interface/Buttons/WHITE8X8")
+    trackBg:SetVertexColor(0.05, 0.15, 0.20, 0.55)
+
+    -- Bordure latérale gauche du rail
+    local trackLine = track:CreateTexture(nil, "BORDER")
+    trackLine:SetWidth(1)
+    trackLine:SetPoint("TOPLEFT",    track, "TOPLEFT",    0, 0)
+    trackLine:SetPoint("BOTTOMLEFT", track, "BOTTOMLEFT", 0, 0)
+    trackLine:SetTexture("Interface/Buttons/WHITE8X8")
+    trackLine:SetVertexColor(unpack(CYAN.borderDim))
+
+    track:Hide()  -- masqué tant que le contenu tient dans la vue
+
+    -- ── Curseur (thumb) ───────────────────────────────────
+    local thumb = CreateFrame("Button", nil, track)
+    thumb:SetWidth(SB_W)
+    thumb:SetPoint("TOPLEFT", track, "TOPLEFT", 0, 0)
+
+    local thumbBg = thumb:CreateTexture(nil, "BACKGROUND")
+    thumbBg:SetAllPoints()
+    thumbBg:SetTexture("Interface/Buttons/WHITE8X8")
+    thumbBg:SetVertexColor(unpack(CYAN.border))
+
+    thumb:SetScript("OnEnter", function()
+        thumbBg:SetVertexColor(unpack(CYAN.textHeader))
+    end)
+    thumb:SetScript("OnLeave", function()
+        thumbBg:SetVertexColor(unpack(CYAN.border))
+    end)
+
+    -- ── Logique de scroll ─────────────────────────────────
+    -- Recalcule la position et la taille du thumb
+    local function UpdateThumb()
+        local viewH    = sf:GetHeight()
+        local totalH   = content:GetHeight()
+        local trackH   = track:GetHeight()
+        if totalH <= viewH or trackH <= 0 then
+            track:Hide()
+            return
+        end
+        track:Show()
+        local ratio    = viewH / totalH
+        local thumbH   = math.max(trackH * ratio, 16)
+        thumb:SetHeight(thumbH)
+
+        local scrollPct = sf:GetVerticalScroll() / (totalH - viewH)
+        local maxY      = trackH - thumbH
+        thumb:SetPoint("TOPLEFT", track, "TOPLEFT", 0, -(scrollPct * maxY))
+    end
+
+    -- Scroll depuis la molette souris
+    sf:EnableMouseWheel(true)
+    sf:SetScript("OnMouseWheel", function(self, delta)
+        local totalH  = content:GetHeight()
+        local viewH   = self:GetHeight()
+        local maxScroll = math.max(0, totalH - viewH)
+        local cur     = self:GetVerticalScroll()
+        local step    = CFG.btnH + CFG.btnPad
+        local new     = math.min(math.max(cur - delta * step, 0), maxScroll)
+        self:SetVerticalScroll(new)
+        UpdateThumb()
+    end)
+
+    -- Clic sur le rail (scroll proportionnel)
+    track:EnableMouse(true)
+    track:SetScript("OnMouseDown", function(self, btn)
+        if btn ~= "LeftButton" then return end
+        local _, trackTop = self:GetPoint()
+        local _, my = GetCursorPosition()
+        local scale = self:GetEffectiveScale()
+        local trackH = self:GetHeight()
+        local clickY = (self:GetTop() - my / scale)
+        local pct    = math.min(math.max(clickY / trackH, 0), 1)
+        local totalH = content:GetHeight()
+        local viewH  = sf:GetHeight()
+        sf:SetVerticalScroll(pct * math.max(0, totalH - viewH))
+        UpdateThumb()
+    end)
+
+    -- Drag du thumb
+    local dragStartY, dragStartScroll = nil, nil
+    thumb:SetScript("OnMouseDown", function(self, btn)
+        if btn ~= "LeftButton" then return end
+        local _, my = GetCursorPosition()
+        local scale = self:GetEffectiveScale()
+        dragStartY      = my / scale
+        dragStartScroll = sf:GetVerticalScroll()
+        self:SetScript("OnUpdate", function()
+            local _, cy = GetCursorPosition()
+            local s = self:GetEffectiveScale()
+            local dy        = dragStartY - cy / s
+            local trackH    = track:GetHeight()
+            local thumbH    = self:GetHeight()
+            local totalH    = content:GetHeight()
+            local viewH     = sf:GetHeight()
+            local scrollRange = math.max(0, totalH - viewH)
+            local pct = dy / math.max(1, trackH - thumbH)
+            local new = math.min(math.max(dragStartScroll + pct * scrollRange, 0), scrollRange)
+            sf:SetVerticalScroll(new)
+            UpdateThumb()
+        end)
+    end)
+    thumb:SetScript("OnMouseUp", function(self)
+        self:SetScript("OnUpdate", nil)
+    end)
+
+    -- Expose UpdateThumb pour que PopulateColumn puisse le rappeler
+    sf._UpdateScrollBar = UpdateThumb
+    -- Recalcul automatique lors du redimensionnement
+    sf:SetScript("OnSizeChanged", function() UpdateThumb() end)
 
     return sf, content
 end
 
 -- =========================================================
--- POPULATION D'UNE COLONNE
+-- POPULATION D'UNE COLONNE (Donjons / Raids)
 -- =========================================================
 local function PopulateColumn(scrollFrame, content, sections, isLegacy)
     local parent = content:GetParent()
-    content:Hide()
+
+    -- Purge buttons belonging to the old content frame from allButtons,
+    -- then detach the frame so WoW can GC it and all its children.
+    for i = #TomoPorter.allButtons, 1, -1 do
+        local btn = TomoPorter.allButtons[i]
+        if btn:GetParent() == content then
+            table.remove(TomoPorter.allButtons, i)
+        end
+    end
+    content:SetParent(nil)   -- severs the frame from the hierarchy → GC eligible
 
     local newContent = CreateFrame("Frame", nil, parent)
     newContent:SetWidth(content:GetWidth())
@@ -433,17 +547,21 @@ local function PopulateColumn(scrollFrame, content, sections, isLegacy)
     end
 
     newContent:SetHeight(math.max(yOff, 10))
+    -- Met à jour la scrollbar custom après chaque peuplement
+    if scrollFrame._UpdateScrollBar then
+        C_Timer.After(0, scrollFrame._UpdateScrollBar)
+    end
     return newContent
 end
 
 -- =========================================================
--- CONSTRUCTION D'UNE COLONNE
+-- CONSTRUCTION D'UNE COLONNE (Donjons / Raids)
 -- =========================================================
-local function BuildColumn(parent, title, category, anchorFrame, anchorPoint, xOff)
+local function BuildColumn(parent, title, category, xOff)
     local colW = CFG.colW
 
     local hdr = parent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    hdr:SetPoint("TOPLEFT", anchorFrame, anchorPoint, xOff + 3, -30)
+    hdr:SetPoint("TOPLEFT", parent, "TOPLEFT", xOff + 3, -8)
     hdr:SetText(title)
     hdr:SetTextColor(unpack(CYAN.textHeader))
 
@@ -455,12 +573,12 @@ local function BuildColumn(parent, title, category, anchorFrame, anchorPoint, xO
     hline:SetVertexColor(unpack(CYAN.border))
 
     local tabCur = CreateTab(parent, L["CURRENT"])
-    tabCur:SetPoint("TOPLEFT", anchorFrame, anchorPoint, xOff + 3, -50)
+    tabCur:SetPoint("TOPLEFT", parent, "TOPLEFT", xOff + 3, -26)
 
     local tabLeg = CreateTab(parent, L["LEGACY"])
     tabLeg:SetPoint("TOPLEFT", tabCur, "TOPRIGHT", 3, 0)
 
-    local scrollFrame, contentRef = CreateScrollFrame(parent, xOff + 3, -76, colW)
+    local scrollFrame, contentRef = CreateScrollFrame(parent, xOff + 3, -52, colW)
     local currentContent = contentRef
 
     local tabActive = "current"
@@ -482,14 +600,139 @@ local function BuildColumn(parent, title, category, anchorFrame, anchorPoint, xO
 end
 
 -- =========================================================
+-- CONSTRUCTION D'UNE COLONNE MAGE (Téléportations / Portails)
+-- =========================================================
+local function BuildMageColumn(parent, title, spellGroups, xOff)
+    local colW = CFG.colW
+
+    -- En-tête de colonne
+    local hdr = parent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    hdr:SetPoint("TOPLEFT", parent, "TOPLEFT", xOff + 3, -8)
+    hdr:SetText(title)
+    hdr:SetTextColor(unpack(CYAN.textHeader))
+
+    local hline = parent:CreateTexture(nil, "ARTWORK")
+    hline:SetHeight(1)
+    hline:SetWidth(colW)
+    hline:SetPoint("TOPLEFT", hdr, "BOTTOMLEFT", 0, -2)
+    hline:SetTexture("Interface/Buttons/WHITE8X8")
+    hline:SetVertexColor(unpack(CYAN.border))
+
+    -- Scroll frame (pas de sous-onglets Current/Legacy pour Mage)
+    local sf, content = CreateScrollFrame(parent, xOff + 3, -26, colW)
+
+    -- Population
+    local yOff = 2
+    for _, section in ipairs(spellGroups) do
+        local hUsed = CreateGroupHeader(content, section.group, yOff)
+        yOff = yOff + hUsed + 3
+        for _, entry in ipairs(section.entries) do
+            CreateTeleportButton(content, entry, yOff)
+            yOff = yOff + CFG.btnH + CFG.btnPad
+        end
+        yOff = yOff + 6
+    end
+    content:SetHeight(math.max(yOff, 10))
+    if sf._UpdateScrollBar then
+        C_Timer.After(0, sf._UpdateScrollBar)
+    end
+end
+
+-- =========================================================
+-- PANEL MAGE
+-- =========================================================
+local function BuildMagePanel(parent)
+    BuildMageColumn(parent, L["TELEPORTS"], Data.mage.teleports, 0)
+    BuildMageColumn(parent, L["PORTALS"],   Data.mage.portals,   CFG.colW + CFG.colGap + 10)
+end
+
+-- =========================================================
 -- BUILD UI
 -- =========================================================
 local function BuildUI()
     local f = CreateMainFrame()
     TomoPorter.frame = f
 
-    BuildColumn(f, L["DUNGEONS"], "dungeons", f, "TOPLEFT", 0)
-    BuildColumn(f, L["RAIDS"],    "raids",    f, "TOPLEFT", CFG.colW + CFG.colGap + 10)
+    -- ── Bande d'onglets de catégorie ─────────────────────────
+    -- Fond de la bande
+    local catBg = f:CreateTexture(nil, "ARTWORK")
+    catBg:SetHeight(CFG.catTabH)
+    catBg:SetPoint("TOPLEFT",  f, "TOPLEFT",  1, -28)
+    catBg:SetPoint("TOPRIGHT", f, "TOPRIGHT", -1, -28)
+    catBg:SetTexture("Interface/Buttons/WHITE8X8")
+    catBg:SetVertexColor(0.03, 0.07, 0.11, 1)
+
+    -- Séparateur horizontal sous la bande de catégorie
+    local catSep = f:CreateTexture(nil, "ARTWORK")
+    catSep:SetHeight(1)
+    catSep:SetPoint("TOPLEFT",  f, "TOPLEFT",  1, -(28 + CFG.catTabH))
+    catSep:SetPoint("TOPRIGHT", f, "TOPRIGHT", -1, -(28 + CFG.catTabH))
+    catSep:SetTexture("Interface/Buttons/WHITE8X8")
+    catSep:SetVertexColor(unpack(CYAN.border))
+
+    -- Création d'un onglet de catégorie
+    local function MakeCatTab(label, xOff)
+        local btn = CreateFrame("Button", nil, f, "BackdropTemplate")
+        btn:SetSize(CFG.catTabW, CFG.catTabH - 2)
+        btn:SetPoint("TOPLEFT", f, "TOPLEFT", xOff, -29)
+        btn:SetBackdrop({ bgFile   = "Interface/Buttons/WHITE8X8",
+                          edgeFile = "Interface/Buttons/WHITE8X8", edgeSize = 1 })
+
+        local txt = btn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        txt:SetAllPoints()
+        txt:SetText(label)
+
+        function btn:SetActive(active)
+            if active then
+                btn:SetBackdropColor(unpack(CYAN.bgCatActive))
+                btn:SetBackdropBorderColor(unpack(CYAN.border))
+                txt:SetTextColor(unpack(CYAN.textCatOn))
+            else
+                btn:SetBackdropColor(unpack(CYAN.bgCatIdle))
+                btn:SetBackdropBorderColor(unpack(CYAN.borderDim))
+                txt:SetTextColor(unpack(CYAN.textCatOff))
+            end
+        end
+        btn:SetActive(false)
+        return btn
+    end
+
+    local catTabTP   = MakeCatTab(L["TAB_PORTEURS"], 6)
+    local catTabMage = MakeCatTab(L["TAB_MAGE"],     6 + CFG.catTabW + 4)
+
+    -- ── Panel Téléporteurs (Donjons + Raids) ─────────────────
+    local tpPanel = CreateFrame("Frame", nil, f)
+    tpPanel:SetPoint("TOPLEFT",     f, "TOPLEFT",     0, -(28 + CFG.catTabH + 2))
+    tpPanel:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0)
+
+    BuildColumn(tpPanel, L["DUNGEONS"], "dungeons", 0)
+    BuildColumn(tpPanel, L["RAIDS"],    "raids",    CFG.colW + CFG.colGap + 10)
+
+    -- ── Panel Mage ────────────────────────────────────────────
+    local magePanel = CreateFrame("Frame", nil, f)
+    magePanel:SetPoint("TOPLEFT",     f, "TOPLEFT",     0, -(28 + CFG.catTabH + 2))
+    magePanel:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0)
+    magePanel:Hide()
+
+    BuildMagePanel(magePanel)
+
+    -- ── Handlers des onglets de catégorie ────────────────────
+    catTabTP:SetScript("OnClick", function()
+        catTabTP:SetActive(true)
+        catTabMage:SetActive(false)
+        tpPanel:Show()
+        magePanel:Hide()
+        f.vsep:Show()
+    end)
+    catTabMage:SetScript("OnClick", function()
+        catTabMage:SetActive(true)
+        catTabTP:SetActive(false)
+        magePanel:Show()
+        tpPanel:Hide()
+        f.vsep:Show()
+    end)
+
+    catTabTP:SetActive(true)
 end
 
 -- =========================================================
@@ -502,7 +745,6 @@ local function Toggle()
         f:Hide()
     else
         f:Show()
-        -- Refresh au Show si on sort juste du combat
         if not InCombatLockdown() then
             RefreshAllButtons()
         end
@@ -514,7 +756,7 @@ SLASH_TOPORTER2 = "/tpt"
 SlashCmdList["TOPORTER"] = function(msg)
     local cmd = (msg or ""):lower():match("^%s*(%S*)")
     if cmd == "help" or cmd == "?" then
-        print("|cff00ddffTomoPorter|r  v1.2")
+        print("|cff00ddffTomoPorter|r  v1.3.1")
         print("  /porter  — ouvre/ferme la fenêtre")
         print("  /tpt     — alias")
     else
@@ -527,23 +769,21 @@ end
 -- =========================================================
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("PLAYER_LOGIN")
-eventFrame:RegisterEvent("SPELLS_CHANGED")       -- sort appris/oublié
-eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED") -- sortie de combat
+eventFrame:RegisterEvent("SPELLS_CHANGED")
+eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 
 eventFrame:SetScript("OnEvent", function(self, event)
     if event == "PLAYER_LOGIN" then
         BuildUI()
-        print("|cff00ddffTomoPorter|r v1.2 chargé — |cff4db8cc/porter|r pour ouvrir")
+        print("|cff00ddffTomoPorter|r v1.3.2 chargé — |cff4db8cc/porter|r pour ouvrir")
         self:UnregisterEvent("PLAYER_LOGIN")
 
     elseif event == "SPELLS_CHANGED" then
-        -- Un sort a été appris ou oublié : mise à jour hors combat
         if not InCombatLockdown() then
             RefreshAllButtons()
         end
 
     elseif event == "PLAYER_REGEN_ENABLED" then
-        -- Sortie de combat : on peut maintenant modifier les attributs sécurisés
         RefreshAllButtons()
     end
 end)

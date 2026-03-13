@@ -95,4 +95,3 @@ Each bar can display up to 3 value columns:
 ## License
 
 All rights reserved © TomoAniki.
-

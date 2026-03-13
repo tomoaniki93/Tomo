@@ -1,6 +1,5 @@
-## Interface: 120001, 120000
-## Interface-Retail: 120001, 120000
-## Title: |cFF55B400Tomo|r|cFF2266AAMythic|r
+## Interface: 120005, 120001, 120000
+## Title: |cffCC44FFTomo|r|cffFFFFFFMythic|r
 ## Notes: Mythic+ UI replacement — standalone, no dependencies. Optional TomoMod skin integration.
 ## Notes-frFR: Remplacement de l'interface Mythic+ — autonome, sans dépendances. Intégration skin TomoMod optionnelle.
 ## Author: Tomo
@@ -9,9 +8,14 @@
 ## OptionalDeps: TomoMod
 ## DefaultState: Enabled
 ## Category: |cffCC44FFTomo|r|cffFFFFFFSuite|r
+## IconTexture: Interface\Icons\Achievement_challengemode_scarlethalls_hourglass
 
 Locales\enUS.lua
 Locales\frFR.lua
+Locales\deDE.lua
+Locales\esES.lua
+Locales\itIT.lua
+Locales\ptBR.lua
 Database.lua
 Core.lua
 Blizzard.lua

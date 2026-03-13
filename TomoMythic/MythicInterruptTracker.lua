@@ -410,6 +410,18 @@ end
 ------------------------------------------------------------
 
 local function RegisterPartyWatchers()
+    -- Shared throttle: UNIT_AURA can fire dozens of times/second in combat.
+    -- We collapse rapid bursts into a single refresh 0.1s later.
+    local auraRefreshPending = false
+    local function ScheduleAuraRefresh()
+        if auraRefreshPending then return end
+        auraRefreshPending = true
+        C_Timer.After(0.1, function()
+            auraRefreshPending = false
+            TM:MIT_RefreshBars()
+        end)
+    end
+
     for i = 1, 4 do
         local unit    = "party" .. i
         local petUnit = "partypet" .. i
@@ -419,8 +431,9 @@ local function RegisterPartyWatchers()
         partyPetFrames[i]:RegisterUnitEvent("UNIT_PET", unit)
         partyFrames[i]:SetScript("OnEvent", function(_, event, u)
             if event == "UNIT_AURA" then
-                -- Aura change could indicate a debuff that modifies CD; refresh display
-                if MIT.playerData[unit] then TM:MIT_RefreshBars() end
+                -- Aura change could indicate a debuff that modifies CD; refresh display.
+                -- Throttled: UNIT_AURA can fire very frequently in combat.
+                if MIT.playerData[unit] then ScheduleAuraRefresh() end
             end
         end)
         partyPetFrames[i]:SetScript("OnEvent", function(_, event, u)
@@ -500,17 +513,32 @@ local function OnSpellCastSucceeded(unit, _, spellID)
     TM:MIT_RefreshBars()
 end
 
+-- UpdateCooldowns: called at 0.1s intervals to animate bar fills smoothly
+-- and detect when a cooldown has expired. Replaces both the old 0.5s
+-- UpdateCooldowns ticker and the per-bar OnUpdate scripts (removed above).
 local function UpdateCooldowns()
     if not TM.db or not TM.db.interrupt then return end
+    if not MIT.mainFrame or not MIT.mainFrame:IsVisible() then return end
     local now = GetTime()
     local changed = false
-    for unit, data in pairs(MIT.playerData) do
-        if not data.ready and data.expires > 0 and now >= data.expires then
-            data.ready   = true
-            data.expires = 0
-            changed = true
+
+    -- Animate bars that are on cooldown
+    for unit, bar in pairs(MIT.bars) do
+        local data = MIT.playerData[unit]
+        if data and not data.ready and data.spellID then
+            local remaining = math.max(0, data.expires - now)
+            if remaining > 0 then
+                bar.fill:SetValue(1 - (remaining / math.max(1, data.cd)))
+                bar.cdFS:SetText(string.format("|cFFFF4422%.1fs|r", remaining))
+            else
+                -- CD expired — mark ready and trigger a full refresh
+                data.ready   = true
+                data.expires = 0
+                changed = true
+            end
         end
     end
+
     if changed then TM:MIT_RefreshBars() end
 end
 
@@ -602,23 +630,6 @@ local function CreateBarRow(parent, unit)
 
     -- 1px border lines
     TM:MakeLineBorders(row, unpack(C.BORDER))
-
-    -- Smooth per-frame fill update when on cooldown
-    row:SetScript("OnUpdate", function(self)
-        local data = MIT.playerData[self.unit]
-        if not data or data.ready or not data.spellID then return end
-        local remaining = math.max(0, data.expires - GetTime())
-        local frac = 1 - (remaining / math.max(1, data.cd))
-        self.fill:SetValue(frac)
-        if remaining > 0 then
-            self.cdFS:SetText(string.format("|cFFFF4422%.1fs|r", remaining))
-        else
-            self.cdFS:SetText("|cFF55DD22" .. TM.L.INTERRUPT_READY .. "|r")
-            data.ready   = true
-            data.expires = 0
-            self.fill:SetValue(1)
-        end
-    end)
 
     row.unit = unit
     return row
@@ -1203,9 +1214,10 @@ function TM:InitInterruptTracker()
     -- Build the UI frame
     self:MIT_BuildFrame()
 
-    -- Start update ticker
+    -- Start update ticker at 0.1s for smooth bar fill animation
+    -- (replaces the old 0.5s ticker + per-bar OnUpdate scripts)
     if not MIT.ticker then
-        MIT.ticker = C_Timer.NewTicker(0.5, UpdateCooldowns)
+        MIT.ticker = C_Timer.NewTicker(0.1, UpdateCooldowns)
     end
 
     -- Announce version to group

@@ -137,6 +137,16 @@ dmEventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 local timerTicker = nil
 local refreshTicker = nil
 
+-- Returns true if any visible window is showing an ACTIONS-type meter
+-- (Interrupts, Dispels, Deaths) — these don't fire DAMAGE_METER_* update events
+-- and require a periodic refresh. Other types are event-driven and don't need it.
+local function NeedsPeriodicRefresh()
+    for _, win in ipairs(ns.windows) do
+        if ns.ACTIONS_TYPES[win.GetMeterType()] then return true end
+    end
+    return false
+end
+
 dmEventFrame:SetScript("OnEvent", function(self, event)
     if event == "DAMAGE_METER_RESET" then
         print(ns.L["ADDON_PREFIX"] .. ns.L["CMD_RESET"])
@@ -154,8 +164,9 @@ dmEventFrame:SetScript("OnEvent", function(self, event)
                 for _, win in ipairs(ns.windows) do win.UpdateTimer() end
             end)
         end
-        -- Periodic refresh during combat for data that doesn't fire update events (actions)
-        if not refreshTicker then
+        -- Periodic refresh only needed for ACTIONS types (Interrupts, Dispels, Deaths)
+        -- which don't fire DAMAGE_METER_* update events.
+        if not refreshTicker and NeedsPeriodicRefresh() then
             refreshTicker = C_Timer.NewTicker(1, function()
                 for _, win in ipairs(ns.windows) do win.Refresh() end
             end)

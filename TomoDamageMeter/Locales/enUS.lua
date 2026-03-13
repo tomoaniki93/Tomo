@@ -86,7 +86,7 @@ L["SETTINGS_SESSION_TYPE"] = "Session Type"
 L["SETTINGS_LOCKED"] = "Lock Position"
 
 -- Slash commands
-L["CMD_RESET"] = "Données réinitialisées."
+L["CMD_RESET"] = "Data reset."
 L["CMD_LOCKED"] = "Locked"
 L["CMD_UNLOCKED"] = "Unlocked"
 L["CMD_HELP_HEADER"] = "Commands:"

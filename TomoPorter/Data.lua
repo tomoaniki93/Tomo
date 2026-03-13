@@ -1,6 +1,6 @@
 -- TomoPorter | Data.lua
--- Base de données des téléporteurs de donjons et raids
--- SpellIDs validés — source : DB communautaire
+-- Base de données des téléporteurs de donjons, raids et sorts de Mage
+-- SpellIDs validés — source : Porter addon (communauté)
 --
 -- Commande de vérification en jeu :
 --   /run print(C_Spell.GetSpellName(SPELL_ID))
@@ -43,24 +43,24 @@ local RAW = {
     [208] = { "Maw of Souls",                           nil     },
     [209] = { "The Arcway",                             nil     },
     [210] = { "Court of Stars",                         393766  },
-    [227] = { "Return to Karazhan: Lower",              373262  },
+    [227] = { "Return to Karazhan",                     373262  },
     [233] = { "Cathedral of Eternal Night",             nil     },
-    [234] = { "Return to Karazhan: Upper",              373262  },
-    [239] = { "Seat of the Triumvirate",                1254551 },
+    [234] = { "Return to Karazhan",                     373262  },
+    [239] = { "Seat of the Triumvirate",                252631  }, -- corrigé (était 1254551)
 
     -- Battle for Azeroth
     [244] = { "Atal'Dazar",                             424187  },
     [245] = { "Freehold",                               410071  },
     [246] = { "Tol Dagor",                              nil     },
-    [247] = { "The MOTHERLODE!!",                       nil     },
+    [247] = { "The MOTHERLODE!!",                       272268  }, -- corrigé (était nil)
     [248] = { "Waycrest Manor",                         424167  },
     [249] = { "Kings' Rest",                            nil     },
     [250] = { "Temple of Sethraliss",                   nil     },
     [251] = { "The Underrot",                           410074  },
     [252] = { "Shrine of the Storm",                    nil     },
-    [353] = { "Siege of Boralus",                       nil     },
-    [369] = { "Operation: Mechagon - Junkyard",         373274  },
-    [370] = { "Operation: Mechagon - Workshop",         373274  },
+    [353] = { "Siege of Boralus",                       445418  }, -- corrigé (était nil)
+    [369] = { "Operation: Mechagon",                    373274  },
+    [370] = { "Operation: Mechagon",                    373274  },
 
     -- Shadowlands
     [375] = { "Mists of Tirna Scithe",                  354464  },
@@ -83,8 +83,13 @@ local RAW = {
     [404] = { "Neltharus",                              393276  },
     [405] = { "Brackenhide Hollow",                     393267  },
     [406] = { "Halls of Infusion",                      393283  },
-    [463] = { "Dawn of the Infinite: Galakrond's Fall", 424197  },
-    [464] = { "Dawn of the Infinite: Murozond's Rise",  424197  },
+    [463] = { "Dawn of the Infinite",                   424197  },
+    [464] = { "Dawn of the Infinite",                   424197  },
+
+    -- Dragonflight Raids
+    [479] = { "Vault of the Incarnates",                432254  }, -- corrigé (était nil)
+    [480] = { "Aberrus, the Shadowed Crucible",         432257  }, -- corrigé (était nil)
+    [481] = { "Amirdrassil, the Dream's Hope",          432258  }, -- corrigé (était nil)
 
     -- Cataclysm
     [438] = { "Vortex Pinnacle",                        410080  },
@@ -103,11 +108,11 @@ local RAW = {
     [525] = { "Operation: Floodgate",                   1216786 },
     [542] = { "Eco-Dome Al'dani",                       1237215 },
 
-    -- Midnight (12.x — PTR)
-    [557] = { "Windrunner Spire",                       1254840 },
+    -- Midnight (PTR 12.x)
+    [557] = { "Windrunner Spire",                       1254400 }, -- corrigé (était 1254840)
     [558] = { "Magisters' Terrace",                     1254572 },
     [559] = { "Nexus-Point Xenas",                      1254563 },
-    [560] = { "Maisara Caverns",                        1255247 },
+    [560] = { "Maisara Caverns",                        1254559 }, -- corrigé (était 1255247)
 }
 
 -- Raccourci : mapID → entry { name, spellID }
@@ -157,7 +162,9 @@ TomoPorter.Data = {
                     e(557),   -- Windrunner Spire
                     e(558),   -- Magisters' Terrace
                     e(559),   -- Nexus-Point Xenas
-                    e(560)    -- Maisara Caverns
+                    e(560),   -- Maisara Caverns
+                    e(556),   -- Pit of Saron
+                    e(239)    -- Seat of the Triumvirate
                 ),
             },
             {
@@ -185,8 +192,8 @@ TomoPorter.Data = {
                     e(404),   -- Neltharus
                     e(405),   -- Brackenhide Hollow
                     e(406),   -- Halls of Infusion
-                    e(463),   -- Dawn of the Infinite: Galakrond's Fall
-                    e(464)    -- Dawn of the Infinite: Murozond's Rise
+                    e(463),   -- Dawn of the Infinite
+                    e(464)    -- Dawn of the Infinite
                 ),
             },
             {
@@ -283,7 +290,7 @@ TomoPorter.Data = {
     },
 
     -- ===================================================
-    -- RAIDS (spellIDs non disponibles dans la DB source)
+    -- RAIDS
     -- ===================================================
     raids = {
 
@@ -293,7 +300,7 @@ TomoPorter.Data = {
                 entries = {
                     { name = "Liberation of Undermine",  spellID = 1226482 },
                     { name = "Manaforge Omega",          spellID = 1239155 },
-                    { name = "Nerub-ar Palace",          spellID = nil },
+                    { name = "Nerub-ar Palace",          spellID = nil     },
                 },
             },
         },
@@ -301,33 +308,226 @@ TomoPorter.Data = {
         legacy = {
             {
                 expansion = "The War Within — Saison 1",
-                entries = {
-                },
+                entries = {},
             },
             {
                 expansion = "Dragonflight",
                 entries = {
-                    { name = "Amirdrassil",                 spellID = nil },
-                    { name = "Aberrus",                     spellID = nil },
-                    { name = "Vault of the Incarnates",     spellID = nil },
+                    { name = "Amirdrassil, the Dream's Hope",    spellID = 432258 }, -- corrigé
+                    { name = "Aberrus, the Shadowed Crucible",   spellID = 432257 }, -- corrigé
+                    { name = "Vault of the Incarnates",          spellID = 432254 }, -- corrigé
                 },
             },
             {
                 expansion = "Shadowlands",
                 entries = {
-                    { name = "Sepulcher of the First Ones", spellID = nil },
-                    { name = "Sanctum of Domination",       spellID = nil },
-                    { name = "Castle Nathria",              spellID = nil },
+                    { name = "Sepulcher of the First Ones",      spellID = 373192 }, -- corrigé
+                    { name = "Sanctum of Domination",            spellID = 373191 }, -- corrigé
+                    { name = "Castle Nathria",                   spellID = 373190 }, -- corrigé
                 },
             },
             {
                 expansion = "Battle for Azeroth",
                 entries = {
-                    { name = "Ny'alotha",                   spellID = nil },
-                    { name = "The Eternal Palace",          spellID = nil },
-                    { name = "Crucible of Storms",          spellID = nil },
-                    { name = "Battle of Dazar'alor",        spellID = nil },
-                    { name = "Uldir",                       spellID = nil },
+                    { name = "Ny'alotha",              spellID = nil },
+                    { name = "The Eternal Palace",     spellID = nil },
+                    { name = "Crucible of Storms",     spellID = nil },
+                    { name = "Battle of Dazar'alor",   spellID = nil },
+                    { name = "Uldir",                  spellID = nil },
+                },
+            },
+        },
+    },
+
+    -- ===================================================
+    -- MAGE — Téléportations & Portails (sorts de classe)
+    -- Source : Porter addon — IDs validés in-game
+    --
+    -- [A] = Alliance uniquement   [H] = Horde uniquement
+    -- Neutral = disponible pour les deux factions
+    --
+    -- Vérification en jeu :
+    --   /run print(C_Spell.GetSpellName(SPELL_ID))
+    -- ===================================================
+    mage = {
+
+        teleports = {
+            {
+                group = "Classic",
+                entries = {
+                    { name = "Stormwind [A]",     spellID = 3561  },
+                    { name = "Ironforge [A]",     spellID = 3562  },
+                    { name = "Darnassus [A]",     spellID = 3565  },
+                    { name = "Orgrimmar [H]",     spellID = 3567  },
+                    { name = "Undercity [H]",     spellID = 3563  },
+                    { name = "Thunder Bluff [H]", spellID = 3566  },
+                },
+            },
+            {
+                group = "The Burning Crusade",
+                entries = {
+                    { name = "Exodar [A]",            spellID = 32271 },
+                    { name = "Silvermoon [H]",         spellID = 32272 },
+                    { name = "Shattrath [A]",          spellID = 33690 },
+                    { name = "Shattrath [H]",          spellID = 35715 }, -- corrigé
+                },
+            },
+            {
+                group = "Wrath of the Lich King",
+                entries = {
+                    { name = "Dalaran — Northrend",    spellID = 53140  },
+                    { name = "Ancient Dalaran",        spellID = 120145 }, -- ajouté
+                },
+            },
+            {
+                group = "Cataclysm",
+                entries = {
+                    { name = "Theramore [A]",          spellID = 49359 },
+                    { name = "Stonard [H]",            spellID = 49358 },
+                    { name = "Tol Barad [A]",          spellID = 88342 },
+                    { name = "Tol Barad [H]",          spellID = 88344 },
+                },
+            },
+            {
+                group = "Mists of Pandaria",
+                entries = {
+                    { name = "Vale of Eternal Blossoms [A]", spellID = 132621 },
+                    { name = "Vale of Eternal Blossoms [H]", spellID = 132627 }, -- corrigé
+                },
+            },
+            {
+                group = "Warlords of Draenor",
+                entries = {
+                    { name = "Stormshield [A]",        spellID = 176248 }, -- ajouté
+                    { name = "Warspear [H]",           spellID = 176242 }, -- ajouté
+                },
+            },
+            {
+                group = "Legion",
+                entries = {
+                    { name = "Dalaran — Broken Isles", spellID = 224869 }, -- corrigé
+                    { name = "Hall of the Guardian",   spellID = 193759 },
+                },
+            },
+            {
+                group = "Battle for Azeroth",
+                entries = {
+                    { name = "Boralus [A]",            spellID = 281403 },
+                    { name = "Dazar'alor [H]",         spellID = 281404 },
+                },
+            },
+            {
+                group = "Shadowlands",
+                entries = {
+                    { name = "Oribos",                 spellID = 344587 }, -- corrigé
+                },
+            },
+            {
+                group = "Dragonflight",
+                entries = {
+                    { name = "Valdrakken",             spellID = 395277 },
+                },
+            },
+            {
+                group = "The War Within",
+                entries = {
+                    { name = "Dornogal",               spellID = 446540 }, -- corrigé
+                },
+            },
+            {
+                group = "Midnight (PTR 12.x)",
+                entries = {
+                    { name = "Silvermoon City",        spellID = 1259190 }, -- ajouté
+                },
+            },
+        },
+
+        portals = {
+            {
+                group = "Classic",
+                entries = {
+                    { name = "Stormwind [A]",     spellID = 10059 },
+                    { name = "Ironforge [A]",     spellID = 11416 },
+                    { name = "Darnassus [A]",     spellID = 11419 },
+                    { name = "Orgrimmar [H]",     spellID = 11417 },
+                    { name = "Undercity [H]",     spellID = 11418 },
+                    { name = "Thunder Bluff [H]", spellID = 11420 },
+                },
+            },
+            {
+                group = "The Burning Crusade",
+                entries = {
+                    { name = "Exodar [A]",            spellID = 32266 },
+                    { name = "Silvermoon [H]",         spellID = 32267 },
+                    { name = "Shattrath [A]",          spellID = 33691 }, -- corrigé
+                    { name = "Shattrath [H]",          spellID = 35717 },
+                },
+            },
+            {
+                group = "Wrath of the Lich King",
+                entries = {
+                    { name = "Dalaran — Northrend",    spellID = 53142  },
+                    { name = "Ancient Dalaran",        spellID = 120146 }, -- ajouté
+                },
+            },
+            {
+                group = "Cataclysm",
+                entries = {
+                    { name = "Theramore [A]",          spellID = 49360 },
+                    { name = "Stonard [H]",            spellID = 49361 },
+                    { name = "Tol Barad [A]",          spellID = 88345 },
+                    { name = "Tol Barad [H]",          spellID = 88346 },
+                },
+            },
+            {
+                group = "Mists of Pandaria",
+                entries = {
+                    { name = "Vale of Eternal Blossoms [A]", spellID = 132620 },
+                    { name = "Vale of Eternal Blossoms [H]", spellID = 132626 }, -- corrigé
+                },
+            },
+            {
+                group = "Warlords of Draenor",
+                entries = {
+                    { name = "Stormshield [A]",        spellID = 176246 }, -- ajouté
+                    { name = "Warspear [H]",           spellID = 176244 }, -- ajouté
+                },
+            },
+            {
+                group = "Legion",
+                entries = {
+                    { name = "Dalaran — Broken Isles", spellID = 224871 }, -- corrigé
+                },
+            },
+            {
+                group = "Battle for Azeroth",
+                entries = {
+                    { name = "Boralus [A]",            spellID = 281400 },
+                    { name = "Dazar'alor [H]",         spellID = 281402 },
+                },
+            },
+            {
+                group = "Shadowlands",
+                entries = {
+                    { name = "Oribos",                 spellID = 344597 }, -- corrigé
+                },
+            },
+            {
+                group = "Dragonflight",
+                entries = {
+                    { name = "Valdrakken",             spellID = 395289 }, -- corrigé
+                },
+            },
+            {
+                group = "The War Within",
+                entries = {
+                    { name = "Dornogal",               spellID = 446534 }, -- corrigé
+                },
+            },
+            {
+                group = "Midnight (PTR 12.x)",
+                entries = {
+                    { name = "Silvermoon City",        spellID = 1259194 }, -- ajouté
                 },
             },
         },

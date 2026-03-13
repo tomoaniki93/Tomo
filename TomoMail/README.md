@@ -1,7 +1,5 @@
 # TomoMail
 
-# ![TomoMail](https://img.shields.io/badge/TomoMail-v1.0.0-0cd29f?style=for-the-badge) ![WoW](https://img.shields.io/badge/WoW-Midnight-blue?style=for-the-badge) ![Interface](https://img.shields.io/badge/Interface-120001-orange?style=for-the-badge)
-
 > Streamlined in-game mail manager for World of Warcraft — send to your alts, guild members, and recent recipients in seconds.
 
 ---
@@ -42,13 +40,13 @@ Your characters are registered automatically each time you log in. The list pers
 | Select a recipient | Click any name in the dropdown |
 | Send to all alts | Click **Send to all alts** button |
 | Autocomplete a name | Type 2+ characters in the **To:** field |
-| Open settings | `/tml` |
+| Open settings | `/tomomail` or `/tmail` |
 
 ---
 
 ## Configuration
 
-Open the settings panel with `/tml`.
+Open the settings panel with `/tomomail` or `/tmail`.
 
 | Option | Description |
 |---|---|

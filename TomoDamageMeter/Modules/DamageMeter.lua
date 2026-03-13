@@ -567,13 +567,6 @@ function ns.CreateMeterWindow(cfg)
     ----------------------------------------------------------------------
 
     function UpdateButton(button, elementData)
-        local barFS = ns.GetFontSize()
-        local barFont = ns.GetFont()
-        button.nameFS:SetFont(barFont, barFS, "OUTLINE")
-        button.rateFS:SetFont(barFont, barFS, "OUTLINE")
-        button.totalFS:SetFont(barFont, barFS, "OUTLINE")
-        button.pctFS:SetFont(barFont, barFS, "OUTLINE")
-
         -- Class color
         local color = RAID_CLASS_COLORS[elementData.classFilename]
         local r, g, b = 0.5, 0.5, 0.5

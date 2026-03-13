@@ -1,4 +1,4 @@
-## Interface: 120001, 120000
+## Interface: 120005, 120001, 120000
 ## Title: |cFFCC44FFTomo|r|cFFFFFFFFSync|r
 ## Notes: Synchronise les objets de vos sacs et banque sur tous vos personnages — affichage dans les tooltips
 ## Notes-frFR: Synchronise les objets de vos sacs et banque sur tous vos personnages — affichage dans les tooltips
@@ -7,9 +7,14 @@
 ## Version: 1.0.0
 ## SavedVariables: TomoSyncDB
 ## Category: |cffCC44FFTomo|r|cffFFFFFFSuite|r
+## IconTexture: Interface\Icons\Spell_nzinsanity_desynchronized
 
 Locales\frFR.lua
 Locales\enUS.lua
+Locales\deDE.lua
+Locales\esES.lua
+Locales\itIT.lua
+Locales\ptBR.lua
 
 Database.lua
 Core.lua
