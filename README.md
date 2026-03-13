@@ -8,8 +8,9 @@ TomoCooldown is part of a family of standalone addons, each with its own color i
 | **TomoMail** | Yellow `#8b5cf6` | Streamlined in-game mail manager |
 | **TomoPorter** | Blue `#8b5cf6` | All your dungeon and raid teleporters |
 | **TomoMythic** | Violet `#8b5cf6` | Mythic+ interface |
+| **TomoDamageMeter** | Red `ffe0115f` | Damage Meter |
 
-All 4 addons are compatible with each other and can be used in any combination.
+All 5 addons are compatible with each other and can be used in any combination.
 
 ---
 
